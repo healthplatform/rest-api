@@ -1,0 +1,35 @@
+{
+  "name": "rest_api",
+  "version": "0.0.1",
+  "description": "Primary REST-API for HealthPlatform frontends",
+  "main": "main.js",
+  "author": "Samuel Marks <samuelmarks@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SamuelMarks/restify_waterline_scaffold"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "tsc && node main.js | bunyan",
+    "prepublish": "tsc",
+    "pretest": "tsc",
+    "test": "mocha test --recursive"
+  },
+  "dependencies": {
+    "async": "^2.0.0-rc.2",
+    "bunyan": "^1.8.0",
+    "esprima": "^2.7.0",
+    "hiredis": "^0.4.1",
+    "node-uuid": "^1.4.3",
+    "redis": "^2.6.0-0",
+    "restify": "^4.0.3",
+    "sails-postgresql": "SamuelMarks/sails-postgresql#8b12901",
+    "tv4": "^1.2.7",
+    "waterline": "^0.12.1"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.3",
+    "supertest": "^1.1.0"
+  }
+}

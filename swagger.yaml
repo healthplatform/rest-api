@@ -1,0 +1,460 @@
+swagger: '2.0'
+info:
+  title: HealthPlatform.io API
+  description: REST API for HealthPlatform.io
+  version: "0.0.1"
+
+host: healthplatform.io
+schemes:
+  - http
+basePath: /api
+produces:
+  - application/json
+paths:
+  /patients:
+    get:
+      summary: List Patient
+      tags:
+        - Patient
+      responses:
+        200:
+          description: List of Patient
+          schema:
+            type: object
+            properties:
+                patients:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Patient'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Batch create Patient
+      tags:
+        - Patient
+      parameters:
+        - name: patient
+          in: body
+          description: Patient to add to the system
+          required: true
+          schema:
+            type: object
+            properties:
+                patients:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Visit'
+      responses:
+        201:
+          description: List of Patient
+          schema:
+            type: object
+            properties:
+                patients:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Patient'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patient:
+    post:
+      summary: Create Patient
+      tags:
+        - Patient
+      parameters:
+        - name: patient
+          in: body
+          description: Patient to add to the system
+          required: true
+          schema:
+            $ref: '#/definitions/Patient'
+      responses:
+        201:
+          description: Patient
+          schema:
+            $ref: '#/definitions/Patient'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patient/{medicare_no}:
+    parameters:
+      - $ref: '#/parameters/medicare_no'
+    get:
+      summary: Retrieve Patient
+      tags:
+        - Patient
+      responses:
+        200:
+          description: Patient
+          schema:
+            $ref: '#/definitions/Patient'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete patient
+      tags:
+        - Patient
+      responses:
+        204:
+          description: Succesful delete response
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patient/{medicare_no}/historic:
+    parameters:
+      - $ref: '#/parameters/medicare_no'
+    get:
+      summary: Retrieve PatientHistory
+      tags:
+        - Patient
+      responses:
+        200:
+          description: PatientHistory
+          schema:
+            $ref: '#/definitions/PatientHistory'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create PatientHistory
+      tags:
+        - PatientHistory
+      parameters:
+        - name: patient_history
+          in: body
+          description: PatientHistory to add to the system
+          required: true
+          schema:
+            $ref: '#/definitions/PatientHistory'
+      responses:
+        201:
+          description: Created PatientHistory
+          schema:
+            $ref: '#/definitions/PatientHistory'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patient/{medicare_no}/visits:
+    parameters:
+      - $ref: '#/parameters/medicare_no'
+    get:
+      summary: Retrieve visits
+      tags:
+        - Visit
+      responses:
+        200:
+          description: Visits of user
+          schema:
+            type: object
+            properties:
+                visits:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Visit'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Batch create Visit
+      tags:
+        - Visit
+      parameters:
+        - name: visit
+          in: body
+          description: Visit to add to the system
+          required: true
+          schema:
+            type: object
+            properties:
+                visits:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Visit'
+      responses:
+        201:
+          description: List of created Visit
+          schema:
+            type: object
+            properties:
+                visits:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Visit'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patient/{medicare_no}/visit:
+    parameters:
+      - $ref: '#/parameters/medicare_no'
+    post:
+      summary: Create Visit
+      tags:
+        - Visit
+      parameters:
+        - name: visit
+          in: body
+          description: Visit to add to the system
+          required: true
+          schema:
+            $ref: '#/definitions/Visit'
+      responses:
+        201:
+          description: Created Visit
+          schema:
+            $ref: '#/definitions/Visit'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patient/{medicare_no}/visit/{createdAt}:
+    parameters:
+      - $ref: '#/parameters/medicare_no'
+      - $ref: '#/parameters/createdAt'
+    get:
+      summary: Retrieve Visit of Patient
+      tags:
+        - Visit
+      responses:
+        200:
+          description: Visit
+          schema:
+            $ref: '#/definitions/Visit'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete Visit
+      tags:
+        - Visit
+      responses:
+        204:
+          description: Succesful delete response
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /patients/next_visits:
+    get:
+      summary: Retrieve Visit of Patient
+      tags:
+        - Patient
+        - Visit
+        - PatientNextVisit
+      responses:
+        200:
+          description: List of PatientNextVisit
+          schema:
+            type: object
+            properties:
+                patient_next_visits:
+                  type: array
+                  items:
+                    $ref: '#/definitions/PatientNextVisit'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+parameters:
+  medicare_no:
+    name: medicare_no
+    in: path
+    description: The identifier number
+    type: string
+    required: true
+  createdAt:
+    name: createdAt
+    in: path
+    description: The createdAt timestamp
+    type: string
+    required: true
+definitions:
+  Contact:
+    type: object
+    properties:
+      first_name:
+        description: First name
+        type: string
+      last_name:
+        description: Last name
+        type: string
+      street:
+        type: string
+      suburb:
+        type: string
+      state:
+        type: string
+      country:
+        type: string
+      contact0:
+        type: string
+      contact1:
+        type: string
+      description:
+        description: 'E.g.: geriatrician or patient'
+        type: string
+  Patient:
+    type: object
+    required:
+      - medicare_no
+    properties:
+      medicare_no:
+        type: string
+      sex:
+        type: string
+      dob:
+        type: string
+        format: date
+      contact:
+        $ref: '#/definitions/Contact'
+      gp:
+        $ref: '#/definitions/Contact'
+      other_specialists:
+        type: array
+        items:
+          $ref: '#/definitions/Contact'
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+  PatientHistory:
+    type: object
+    required:
+      - medicare_no
+    properties:
+      medicare_no:
+        type: string
+      hypertension:
+        type: boolean
+      asthma:
+        type: boolean
+      diabetes:
+        type: boolean
+      diabetes_type:
+        type: string
+      diabetic_since:
+        type: string
+        format: date
+      diabetes_control:
+        type: string
+      hbA1c:
+        type: number
+      allergies:
+        type: array
+        items:
+          type: string
+      current_medication:
+        type: array
+        items:
+          type: string
+      eyedrop_intolerance:
+        type: string
+      family_social_history:
+        type: string
+      ethnicity:
+        type: string
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+  Visit:
+    type: object
+    properties:
+      visit_id:
+        type: string
+      reason:
+        type: string
+      acuity_right_eye_num:
+        type: number
+      acuity_right_eye_den:
+        type: number
+      iop_right_eye:
+        type: number
+      gonio_right_eye:
+        type: number
+      refraction_right_eye:
+        type: number
+      cct_right_eye:
+        type: number
+      vf_right_eye:
+        type: string
+      retinal_disc_right_eye:
+        type: string
+      additional_right_eye:
+        type: array
+        items:
+          type: string
+      acuity_left_eye_num:
+        type: number
+      acuity_left_eye_den:
+        type: number
+      iop_left_eye:
+        type: number
+      gonio_left_eye:
+        type: number
+      refraction_left_eye:
+        type: number
+      cct_left_eye:
+        type: number
+      vf_left_eye:
+        type: string
+      retinal_disc_left_eye:
+        type: string
+      additional_left_eye:
+        type: array
+        items:
+          type: string
+      callback:
+        type: string
+        format: date
+      medicare_no:
+        type: string
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+  PatientNextVisit:
+    type: object
+    properties:
+      callback:
+        type: string
+        format: date
+      first_name:
+        type: string
+      last_name:
+        type: string
+      medicare_no:
+        type: string
+      suburb:
+        type: string
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+      error_message:
+        type: string
