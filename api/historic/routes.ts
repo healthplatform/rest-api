@@ -11,6 +11,7 @@ import {collections} from '../../main';
 import {has_body} from './../../utils/validators';
 import {IPatientHistory} from './models.d.ts';
 import {fmtError} from '../../utils/helpers';
+import {fetchHistoric, IPatientHistoryFetchRequest} from './middleware';
 import CustomError = errors.CustomError;
 
 
@@ -49,20 +50,12 @@ export function create(app: restify.Server, namespace: string = ""): void {
 export function get(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.get(`${namespace}/patient/:medicare_no/${noun}`,
-        function (req: restify.Request, res: restify.Response, next: restify.Next) {
-            const PatientHistory: waterline.Query = collections['patient_historic_tbl'];
-
-            PatientHistory.findOne({medicare_no: req.params.medicare_no}).exec(
-                (error, historic: IPatientHistory) => {
-                    if (error) {
-                        const e: errors.CustomError = fmtError(error);
-                        res.send(e.statusCode, e.body);
-                        return next();
-                    }
-                    res.json(historic);
-                    return next();
-                });
+    app.get(`${namespace}/patient/:medicare_no/${noun}`, fetchHistoric,
+        function (req: IPatientHistoryFetchRequest, res: restify.Response, next: restify.Next) {
+            setTimeout(() => {
+                res.json(req.historic);
+                return next();
+            }, 2000);
         }
     );
 }

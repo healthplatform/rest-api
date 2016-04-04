@@ -19,7 +19,7 @@ const logger = createLogger({
 });
 // Merge custom errors
 
-if (process.env.DEBUG) {
+if (!process.env.NO_DEBUG) {
     var i = {};
     Object.keys(process.env)
         .sort()
@@ -67,7 +67,7 @@ export let collections: waterline.Query[] = null;
 export function main(models_and_routes: helpers.IModelRoute,
                      callback?: (app: restify.Server, connections?: any[]) => void,
                      skip_db: boolean = false,
-                     createSampleData: boolean = !!process.env.createSampleData) {
+                     createSampleData: boolean = !process.env.NO_SAMPLE_DATA) {
     // Init server obj
     let app = restify.createServer();
     const root: string = '/api';
@@ -162,8 +162,15 @@ export function main(models_and_routes: helpers.IModelRoute,
                         else console.info(results.map(
                             (result: any) =>
                                 result instanceof Array ?
-                                {[result[0].func_name]: result.map(r => `${r.statusCode} ${r.statusCode}, `)} :
-                                {[result.func_name]: `${result.statusCode} ${result.statusCode}, `}
+                                {
+                                    [result[0].func_name]: result.map(r =>
+                                        `${r.statusCode} ${r.statusMessage}, `
+                                    ).reduce((countDict, word) => {
+                                        countDict[word] = ++countDict[word] || 1;
+                                        return countDict
+                                    }, {})
+                                } :
+                                {[result.func_name]: `${result.statusCode} ${result.statusMessage}, `}
                             )
                         )
                     });

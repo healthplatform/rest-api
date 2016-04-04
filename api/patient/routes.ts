@@ -14,6 +14,10 @@ import {IPatient} from './models.d';
 import {IContact} from '../contact/models.d';
 import {NotFoundError} from '../../utils/errors';
 import {createPatient} from './utils';
+import {fetchPatient, IPatientFetchRequest} from './middleware';
+import {fetchHistoric, IPatientHistoryFetchRequest} from './../historic/middleware';
+import {fetchVisits, IVisitsFetchRequest} from './../visit/middleware';
+
 import CustomError = errors.CustomError;
 
 
@@ -36,27 +40,10 @@ export function create(app: restify.Server, namespace: string = ""): void {
 }
 
 export function get(app: restify.Server, namespace: string = ""): void {
-    app.get(`${namespace}/:medicare_no`,
-        function (req: restify.Request, res: restify.Response, next: restify.Next) {
-            const Patient: waterline.Query = collections['patient_tbl'];
-
-            const q = Patient.findOne({medicare_no: req.params.medicare_no});
-            if (req.params.populate_contact)
-                q.populate('contact')
-                    .populate('gp')
-                    .populate('other_specialists');
-            q.exec((error, patient: IPatient) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
-                else if (!patient) {
-                    return next(new NotFoundError(`patient with medicare_no '${req.params.medicare_no}'`));
-                }
-                res.json(patient.toJSON());
-                return next();
-            });
+    app.get(`${namespace}/:medicare_no`, fetchPatient,
+        function (req: IPatientFetchRequest, res: restify.Response, next: restify.Next) {
+            res.json(req.patient.toJSON());
+            return next();
         }
     );
 }
@@ -65,12 +52,6 @@ export function del(app: restify.Server, namespace: string = ""): void {
     app.del(`${namespace}/:medicare_no`,
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Patient: waterline.Query = collections['patient_tbl'];
-
-            console.log('req.params =', req.params);
-            console.log('req.body =', req.body);
-            req.log.info('req.params =', req.params);
-            req.log.info('req.body =', req.body);
-
 
             // Don't delete Contact, even with no Patient, Contact may prove useful whence persisted
             Patient.destroy({medicare_no: req.params.medicare_no}).exec(
@@ -92,7 +73,13 @@ export function batchGet(app: restify.Server, namespace: string = ""): void {
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Patient: waterline.Query = collections['patient_tbl'];
 
-            Patient.find().exec((error, patients) => {
+            const q = Patient.find();
+            if (req.params.populate_contact)
+                q.populate('contact')
+                    .populate('gp')
+                    .populate('other_specialists');
+
+            q.exec((error, patients) => {
                 if (error) {
                     const e: errors.CustomError = fmtError(error);
                     res.send(e.statusCode, e.body);
@@ -144,7 +131,6 @@ export function batchDelete(app: restify.Server, namespace: string = ""): void {
             const Patient: waterline.Query = collections['patient_tbl'];
 
             if (!req.body.patients) return next(new NotFoundError('patients key on body'));
-            req.log.info('req.body.patients =', req.body.patients);
             Patient.destroy({medicare_no: req.body.patients.map(v => v.medicare_no)}).exec((error) => {
                 if (error) {
                     const e: errors.CustomError = fmtError(error);
@@ -156,4 +142,26 @@ export function batchDelete(app: restify.Server, namespace: string = ""): void {
             });
         }
     )
+}
+
+interface IFetchAllPatientRelated extends IPatientFetchRequest, IPatientHistoryFetchRequest, IVisitsFetchRequest {
+}
+
+export function getAllPatientRelated(app: restify.Server, namespace: string = ""): void {
+    app.get(`${namespace}/:medicare_no/all`,
+        function (req: IFetchAllPatientRelated, res: restify.Response, next: restify.Next) {
+            async.parallel([
+                cb => fetchPatient(req, res, cb),
+                cb => fetchHistoric(req, res, cb),
+                cb => fetchVisits(req, res, cb)
+            ], () => {
+                res.json({
+                    visits: req.visits,
+                    historic: req.historic,
+                    patient: req.patient
+                });
+                return next();
+            });
+        }
+    );
 }

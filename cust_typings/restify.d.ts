@@ -1,5 +1,5 @@
 declare module "restify" {
-  interface Next {
-    ifError(err?: any): any;
-  }
+    interface Next {
+        ifError?(err?: any): any;
+    }
 }
