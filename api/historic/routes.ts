@@ -52,10 +52,8 @@ export function get(app: restify.Server, namespace: string = ""): void {
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
     app.get(`${namespace}/patient/:medicare_no/${noun}`, fetchHistoric,
         function (req: IPatientHistoryFetchRequest, res: restify.Response, next: restify.Next) {
-            setTimeout(() => {
-                res.json(req.historic);
-                return next();
-            }, 2000);
+            res.json(req.historic);
+            return next();
         }
     );
 }
