@@ -1,9 +1,12 @@
 import * as async from 'async';
 import {main, all_models_and_routes} from './../../../main';
-import {test_sdk} from './patient_test_sdk';
+import {PatientTestSDK} from './patient_test_sdk';
 import {PatientMocks} from './patient_mocks';
+import {AuthTestSDK} from './../auth/auth_test_sdk';
 
 const models_and_routes: helpers.IModelRoute = {
+    user: all_models_and_routes['user'],
+    auth: all_models_and_routes['auth'],
     contact: all_models_and_routes['contact'],
     patient: all_models_and_routes['patient']
 };
@@ -13,17 +16,33 @@ describe('Patient::routes', () => {
         (app, connections) => {
             this.connections = connections;
             this.app = app;
-            this.sdk = test_sdk(this.app);
             this.mocks = new PatientMocks();
-            done();
+            this.authSDK = new AuthTestSDK(this.app);
+
+            async.waterfall([
+                cb => this.authSDK.logout_unregister(undefined, () => cb()),
+                cb => this.authSDK.register_login(undefined, cb)
+            ], (err, token) => {
+                if (err) {
+                    return done(err);
+                }
+                this.token = token;
+                this.sdk = new PatientTestSDK(this.app, this.token);
+                return done();
+            });
+
         }
     ));
 
     // Deregister database adapter connections
     after(done =>
-        async.parallel(Object.keys(this.connections).map(
-            connection => this.connections[connection]._adapter.teardown
-        ), (err, _res) => done(err))
+        async.waterfall([
+                cb => this.authSDK.logout_unregister(undefined, cb),
+                cb => async.parallel(Object.keys(this.connections).map(
+                    connection => this.connections[connection]._adapter.teardown
+                ), cb)
+            ], done
+        )
     );
 
     describe('/api/patient', () => {
@@ -42,15 +61,15 @@ describe('Patient::routes', () => {
 
     describe('/api/patients', () => {
         beforeEach(done =>
-            this.sdk.deregisterManyFaux(this.mocks, done)
+            this.sdk.deregisterMany(this.mocks, done)
         );
 
         afterEach(done =>
-            this.sdk.deregisterManyFaux(this.mocks, done)
+            this.sdk.deregisterMany(this.mocks, done)
         );
 
         it('POST should create many Patient', (done) => {
-            this.sdk.registerManyFaux(this.mocks, done);
+            this.sdk.registerMany(this.mocks, done);
         });
     });
 });

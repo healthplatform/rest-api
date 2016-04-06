@@ -182,7 +182,7 @@ declare module waterline {
     }
 
     export interface Record {
-        id: number;
+        id?: number;
         createdAt: Date;
         updatedAt: Date;
     }

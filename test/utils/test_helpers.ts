@@ -5,7 +5,6 @@
 /// <reference path='./../../typings/async/async.d.ts' />
 
 import {expect} from 'chai';
-import * as async from 'async';
 import {binarySearch, isShallowSubset, uri_to_config} from './../../utils/helpers';
 
 
@@ -54,11 +53,11 @@ describe('utils::helpers', () => {
                 );
 
                 it('can be found with two identical objects', () =>
-                    expect(isShallowSubset({ a: 1 }, { a: 1 })).to.be.true
+                    expect(isShallowSubset({a: 1}, {a: 1})).to.be.true
                 );
 
                 it('can be found with two object_0.length < object_1.length', () =>
-                    expect(isShallowSubset({ a: 1 }, { a: 1, b: 6 })).to.be.true
+                    expect(isShallowSubset({a: 1}, {a: 1, b: 6})).to.be.true
                 );
             });
         });
@@ -85,42 +84,42 @@ describe('utils::helpers', () => {
 
             describe('Object Object', () => {
                 it('experienced with object_1 empty', () =>
-                    expect(isShallowSubset({ a: 5 }, {})).to.be.false
+                    expect(isShallowSubset({a: 5}, {})).to.be.false
                 );
 
                 it('experienced with with two same length, different objects', () =>
-                    expect(isShallowSubset({ a: 1 }, { b: 1 })).to.be.false
+                    expect(isShallowSubset({a: 1}, {b: 1})).to.be.false
                 );
 
                 it('experienced with with two different length, different objects', () =>
-                    expect(isShallowSubset({ a: 1, c: 7 }, { b: 1, j: 10, l: null })).to.be.false
+                    expect(isShallowSubset({a: 1, c: 7}, {b: 1, j: 10, l: null})).to.be.false
                 );
 
                 it('experienced with two object_0.length > object_1.length', () =>
-                    expect(isShallowSubset({ a: 1, b: 6 }, { a: 1 })).to.be.false
+                    expect(isShallowSubset({a: 1, b: 6}, {a: 1})).to.be.false
                 );
             });
         });
 
         describe('irl', () => {
             const schema = {
-                email: { type: 'string' },
-                password: { type: 'string' },
-                title: { type: 'string' },
-                first_name: { type: 'string' },
-                last_names: { type: 'string' }
+                email: {type: 'string'},
+                password: {type: 'string'},
+                title: {type: 'string'},
+                first_name: {type: 'string'},
+                last_names: {type: 'string'}
             };
 
             it('should validate with good request-body', () => [
-                { email: 'fff' },
-                { title: 'sfsdf' },
-                { title: 'sfsdf', email: 'sdf' }
+                {email: 'fff'},
+                {title: 'sfsdf'},
+                {title: 'sfsdf', email: 'sdf'}
             ].map(request => expect(isShallowSubset(request, schema)).to.be.true));
 
             it('should fail with bad request-body', () => [
-                { foo: 'dsf' },
-                { bar: 'can', haz: 'baz' },
-                { title: 'foo', haz: 'baz' }
+                {foo: 'dsf'},
+                {bar: 'can', haz: 'baz'},
+                {title: 'foo', haz: 'baz'}
             ].map(request => expect(isShallowSubset(request, schema)).to.be.false));
         })
     });
@@ -134,7 +133,7 @@ describe('utils::helpers', () => {
                 "password": "postgres",
                 "user": "postgres",
             });
-            
+
         });
 
         it('should work with minimal', () => {
@@ -145,12 +144,14 @@ describe('utils::helpers', () => {
             });
         });
 
-        it('should work with proto+host+user', () => {
-            expect(uri_to_config('postgresql://postgres:localhost')).to.deep.equal({
-                "database": "postgres",
-                "host": "localhost",
-                "user": "postgres"
-            });
-        });
+        /*
+         it('should work with proto+host+user', () => {
+         expect(uri_to_config('postgresql://postgres:localhost')).to.deep.equal({
+         "database": "postgres",
+         "host": "localhost",
+         "user": "postgres"
+         });
+         });
+         */
     })
 });

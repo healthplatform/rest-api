@@ -17,12 +17,13 @@ import {createPatient} from './utils';
 import {fetchPatient, IPatientFetchRequest} from './middleware';
 import {fetchHistoric, IPatientHistoryFetchRequest} from './../historic/middleware';
 import {fetchVisits, IVisitsFetchRequest} from './../visit/middleware';
+import {has_auth} from '../auth/middleware';
 
 import CustomError = errors.CustomError;
 
 
 export function create(app: restify.Server, namespace: string = ""): void {
-    app.post(namespace, has_body, //mk_valid_body_mw(user_schema),
+    app.post(namespace, has_body, has_auth(), //mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             type IResult = [IContact, IPatient];
             createPatient(req.body, (error, results: IResult) => {
@@ -40,7 +41,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
 }
 
 export function get(app: restify.Server, namespace: string = ""): void {
-    app.get(`${namespace}/:medicare_no`, fetchPatient,
+    app.get(`${namespace}/:medicare_no`, has_auth(), fetchPatient,
         function (req: IPatientFetchRequest, res: restify.Response, next: restify.Next) {
             res.json(req.patient.toJSON());
             return next();
@@ -49,7 +50,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
 }
 
 export function del(app: restify.Server, namespace: string = ""): void {
-    app.del(`${namespace}/:medicare_no`,
+    app.del(`${namespace}/:medicare_no`, has_auth(),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Patient: waterline.Query = collections['patient_tbl'];
 
@@ -69,7 +70,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
 }
 
 export function batchGet(app: restify.Server, namespace: string = ""): void {
-    app.get(`${namespace}s`,
+    app.get(`${namespace}s`, has_auth(),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Patient: waterline.Query = collections['patient_tbl'];
 
@@ -93,7 +94,7 @@ export function batchGet(app: restify.Server, namespace: string = ""): void {
 }
 
 export function batchCreate(app: restify.Server, namespace: string = ""): void {
-    app.post(`${namespace}s`, has_body, //mk_valid_body_mw(user_schema),
+    app.post(`${namespace}s`, has_body, has_auth(), //mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             type IResult = Array<[IContact, IPatient]>;
 
@@ -126,7 +127,7 @@ export function batchCreate(app: restify.Server, namespace: string = ""): void {
 }
 
 export function batchDelete(app: restify.Server, namespace: string = ""): void {
-    app.del(`${namespace}s`, has_body, //mk_valid_body_mw(user_schema),
+    app.del(`${namespace}s`, has_body, has_auth(),//mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Patient: waterline.Query = collections['patient_tbl'];
 
@@ -148,7 +149,7 @@ interface IFetchAllPatientRelated extends IPatientFetchRequest, IPatientHistoryF
 }
 
 export function getAllPatientRelated(app: restify.Server, namespace: string = ""): void {
-    app.get(`${namespace}/:medicare_no/all`,
+    app.get(`${namespace}/:medicare_no/all`, has_auth(),
         function (req: IFetchAllPatientRelated, res: restify.Response, next: restify.Next) {
             async.parallel([
                 cb => fetchPatient(req, res, cb),

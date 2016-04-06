@@ -152,6 +152,7 @@ export function main(models_and_routes: helpers.IModelRoute,
                 if (createSampleData) {
                     const sampleData = new SampleData(app.url);
                     async.series([
+                        cb => sampleData.registerLogin(cb),
                         cb => sampleData.deletePatientsHttp(cb),
                         cb => sampleData.loadPatientsHttp(cb),
                         cb => sampleData.deleteHistoricHttp(cb),

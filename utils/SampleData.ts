@@ -9,6 +9,7 @@ import {IPatientHistoryBase} from '../api/historic/models.d';
 import {VisitMocks} from '../test/api/visit/visit_mocks';
 import {IVisitBase, IVisit} from '../api/visit/models.d';
 import {trivial_merge} from './helpers';
+import {user_mocks} from '../test/api/user/user_mocks';
 
 interface callback {
     (res: IncomingMessageF): void;
@@ -65,8 +66,10 @@ const httpHEAD = httpF('HEAD'),
 
 export class SampleData {
     public patientMocks = new PatientMocks();
+    public userMocks = user_mocks.successes;
     public historicMocks: IPatientHistoryBase[] = HistoricMocks;
     public visitMocks: IVisitBase[] = VisitMocks;
+    public token: string;
     private uri: url.Url;
 
     constructor(uri: string/*only: Array<string>, uri: string,
@@ -95,11 +98,30 @@ export class SampleData {
             host: this.uri.host === `[::]:${this.uri.port}` ? 'localhost' :
                 `${this.uri.host.substr(this.uri.host.lastIndexOf(this.uri.port) + this.uri.port.length)}`,
             port: parseInt(this.uri.port),
-            headers: {
+            headers: trivial_merge({
                 'Content-Type': 'application/json',
                 'Content-Length': body ? Buffer.byteLength(body) : 0
-            }
+            }, this.token ? {'X-Access-Token': this.token} : {})
         }, options)
+    }
+
+    registerLogin(cb) {
+        const body = JSON.stringify(this.userMocks[0]);
+        async.series([
+            callback => httpPOST(
+                this.mergeOptions({path: '/api/user'}),
+                'registerLogin::user', body, () => callback()
+            ),
+            callback => httpPOST(
+                this.mergeOptions({path: '/api/auth'}),
+                'registerLogin::auth', body, callback
+            ),
+        ], (err, res) => {
+            if (err) return cb(err);
+            this.token = (<{headers: {[a: string]: string}}>res[1]).headers['x-access-token'];
+            console.log('this.token =', this.token);
+            return cb(err, this.token);
+        });
     }
 
     deletePatientsHttp(cb) {

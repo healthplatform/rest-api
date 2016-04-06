@@ -1,5 +1,3 @@
-/// <reference path='./../../../api/user/models.d.ts' />
-
 import {IUserBase} from '../../../api/user/models.d';
 
 export const user_mocks: { successes: Array<IUserBase>, failures: Array<{}> } = {

@@ -12,7 +12,7 @@ import {expect} from 'chai';
 import * as async from 'async';
 
 import {main, all_models_and_routes} from './../../../main';
-import {test_sdk, unregister_all} from './../auth/auth_test_sdk';
+import {AuthTestSDK} from './../auth/auth_test_sdk';
 import {AccessToken} from './../../../api/auth/models';
 import {user_mocks} from './user_mocks';
 import {ITestSDK} from '../auth/auth_test_sdk.d';
@@ -27,21 +27,21 @@ describe('User::routes', () => {
         (app, connections) => {
             this.connections = connections;
             this.app = app;
-            this.sdk = test_sdk(this.app);
+            this.sdk = new AuthTestSDK(this.app);
             done();
         }
     ));
 
     // Deregister database adapter connections
     after(done =>
-        async.parallel(Object.keys(this.connections).map(
+        this.connections && async.parallel(Object.keys(this.connections).map(
             connection => this.connections[connection]._adapter.teardown
         ), (err, _res) => done(err))
     );
 
     describe('/api/user', () => {
-        beforeEach(done => unregister_all(this.sdk, user_mocks.successes, done));
-        afterEach(done => unregister_all(this.sdk, user_mocks.successes, done));
+        beforeEach(done => this.sdk.unregister_all(user_mocks.successes, done));
+        afterEach(done => this.sdk.unregister_all(user_mocks.successes, done));
 
         it('POST should create user', (done) => {
             this.sdk.register(user_mocks.successes[0], done);

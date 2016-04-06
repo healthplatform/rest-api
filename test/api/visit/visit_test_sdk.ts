@@ -38,10 +38,10 @@ export class VisitTestSDK {
             })
     }
 
-    registerManyFaux(visits: IVisit[], cb: auth_test_sdk_cb) {
+    registerManyFaux(visits: {visits: IVisit[]}, cb: auth_test_sdk_cb) {
         if (!visits) return cb(new TypeError('visits argument to registerManyFaux must be defined'));
 
-        async.map(visits, this.register, cb);
+        async.map(visits.visits, this.register, cb);
     }
 
     deregisterManyFaux(visits: {visits: IVisit[]}, cb: auth_test_sdk_cb) {

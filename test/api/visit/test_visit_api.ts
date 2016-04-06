@@ -1,7 +1,7 @@
 import * as async from 'async';
 import {main, all_models_and_routes} from './../../../main';
 import {VisitTestSDK} from './visit_test_sdk';
-import {test_sdk as patient_test_sdk} from './../patient/patient_test_sdk';
+import {PatientTestSDK} from './../patient/patient_test_sdk';
 import {VisitMocks} from './visit_mocks';
 import {PatientMocks} from '../patient/patient_mocks';
 import {IVisit} from '../../../api/visit/models.d';
@@ -20,9 +20,20 @@ describe('Visit::routes', () => {
             self.connections = connections;
             self.app = app;
             self.sdk = new VisitTestSDK(self.app);
-            self.patient_sdk = patient_test_sdk(self.app);
             self.patient_mocks = new PatientMocks();
             self.mocks = VisitMocks;
+
+            async.waterfall([
+                cb => this.authSDK.logout_unregister(undefined, () => cb()),
+                cb => this.authSDK.register_login(undefined, cb)
+            ], (err, token) => {
+                if (err) {
+                    return done(err);
+                }
+                self.token = token;
+                self.patientSDK = new PatientTestSDK(self.app, self.token);
+                return done();
+            });
             done();
         }
     ));

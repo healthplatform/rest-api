@@ -1,18 +1,6 @@
-/// <reference path='./../../../typings/restify/restify.d.ts' />
-/// <reference path='./../../../typings/supertest/supertest.d.ts' />
-/// <reference path='./../../../typings/mocha/mocha.d.ts' />
-/// <reference path='./../../../typings/chai/chai.d.ts' />
-/// <reference path='./../../../typings/async/async.d.ts' />
-/// <reference path='./../../../utils/helpers.d.ts' />
-
-
-import * as supertest from 'supertest';
-import * as restify from 'restify';
-import {expect} from 'chai';
 import * as async from 'async';
-
 import {main, all_models_and_routes} from './../../../main';
-import {test_sdk, unregister_all} from './../auth/auth_test_sdk';
+import {AuthTestSDK} from './../auth/auth_test_sdk';
 import {AccessToken} from './../../../api/auth/models';
 import {user_mocks} from './../user/user_mocks';
 import {ITestSDK} from './auth_test_sdk.d';
@@ -27,7 +15,7 @@ describe('Auth::routes', () => {
         (app, connections) => {
             this.connections = connections;
             this.app = app;
-            this.sdk = test_sdk(this.app);
+            this.sdk = new AuthTestSDK(this.app);
             done();
         }
     ));
@@ -40,8 +28,8 @@ describe('Auth::routes', () => {
     );
 
     describe('/api/auth', () => {
-        beforeEach(done => unregister_all(this.sdk, user_mocks.successes, done));
-        afterEach(done => unregister_all(this.sdk, user_mocks.successes, done));
+        beforeEach(done => this.sdk.unregister_all(user_mocks.successes, () => done()));
+        afterEach(done => this.sdk.unregister_all(user_mocks.successes,  () => done()));
 
         it('POST should login user', (done) => {
             const sdk: ITestSDK = this.sdk;
