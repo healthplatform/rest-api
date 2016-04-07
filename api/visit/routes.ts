@@ -5,12 +5,13 @@ import {collections} from './../../main';
 import {fmtError} from './../../utils/helpers';
 import {IVisit} from './models.d.ts';
 import {fetchVisit, fetchVisits, IVisitFetchRequest, IVisitsFetchRequest} from './middleware';
+import {has_auth} from '../auth/middleware';
 
 
 export function create(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, //mk_valid_body_mw(user_schema),
+    app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, has_auth(), //mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Visit: waterline.Query = collections['visit_tbl'],
                 Patient: waterline.Query = collections['patient_tbl'];
@@ -46,7 +47,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
 export function get(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.get(`${namespace}/patient/:medicare_no/${noun}/:createdAt`, fetchVisit,
+    app.get(`${namespace}/patient/:medicare_no/${noun}/:createdAt`, has_auth(), fetchVisit,
         function (req: IVisitFetchRequest, res: restify.Response, next: restify.Next) {
             res.json(req.visit);
             return next();
@@ -57,7 +58,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
 export function del(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.del(`${namespace}/patient/:medicare_no/${noun}/:createdAt`,
+    app.del(`${namespace}/patient/:medicare_no/${noun}/:createdAt`, has_auth(),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Visit: waterline.Query = collections['visit_tbl'];
 
@@ -77,7 +78,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
 export function batchGet(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.get(`${namespace}/patient/:medicare_no/${noun}s`, fetchVisits,
+    app.get(`${namespace}/patient/:medicare_no/${noun}s`, has_auth(), fetchVisits,
         function (req: IVisitsFetchRequest, res: restify.Response, next: restify.Next) {
             res.json({'visits': req.visits});
             return next();
@@ -88,7 +89,7 @@ export function batchGet(app: restify.Server, namespace: string = ""): void {
 export function batchCreate(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.post(`${namespace}/patient/:medicare_no/${noun}s`, has_body,
+    app.post(`${namespace}/patient/:medicare_no/${noun}s`, has_body, has_auth(),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Visit: waterline.Query = collections['visit_tbl'],
                 Patient: waterline.Query = collections['patient_tbl'];
@@ -124,7 +125,7 @@ export function batchCreate(app: restify.Server, namespace: string = ""): void {
 export function batchDelete(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.del(`${namespace}/patient/:medicare_no/${noun}s`, has_body, //mk_valid_body_mw(user_schema),
+    app.del(`${namespace}/patient/:medicare_no/${noun}s`, has_body, has_auth(), //mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const Visit: waterline.Query = collections['visit_tbl'];
 

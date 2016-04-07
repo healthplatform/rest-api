@@ -12,13 +12,14 @@ import {has_body} from './../../utils/validators';
 import {IPatientHistory} from './models.d.ts';
 import {fmtError} from '../../utils/helpers';
 import {fetchHistoric, IPatientHistoryFetchRequest} from './middleware';
+import {has_auth} from '../auth/middleware';
 import CustomError = errors.CustomError;
 
 
 export function create(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, //mk_valid_body_mw(user_schema),
+    app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, has_auth(), //mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const PatientHistory: waterline.Query = collections['patient_historic_tbl'],
                 Patient: waterline.Query = collections['patient_tbl'];
@@ -50,7 +51,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
 export function get(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.get(`${namespace}/patient/:medicare_no/${noun}`, fetchHistoric,
+    app.get(`${namespace}/patient/:medicare_no/${noun}`, has_auth(), fetchHistoric,
         function (req: IPatientHistoryFetchRequest, res: restify.Response, next: restify.Next) {
             res.json(req.historic);
             return next();
@@ -61,7 +62,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
 export function del(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.del(`${namespace}/patient/:medicare_no/${noun}`,
+    app.del(`${namespace}/patient/:medicare_no/${noun}`, has_auth(),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const PatientHistory: waterline.Query = collections['patient_historic_tbl'];
 

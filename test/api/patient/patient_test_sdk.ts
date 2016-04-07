@@ -5,7 +5,7 @@ import {IPatient} from '../../../api/patient/models.d';
 
 
 export class PatientTestSDK {
-    constructor(public app, private token: string) {
+    constructor(private app, private token: string) {
         if (!token) {
             throw TypeError('PatientTestSDK needs token filled');
         }

@@ -1,6 +1,6 @@
 {
   "name": "rest_api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Primary REST-API for HealthPlatform frontends",
   "main": "main.js",
   "author": "Samuel Marks <samuelmarks@gmail.com>",

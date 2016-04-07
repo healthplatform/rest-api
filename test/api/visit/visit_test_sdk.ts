@@ -5,13 +5,17 @@ import {cb as auth_test_sdk_cb} from './../auth/auth_test_sdk.d';
 import {IVisit} from '../../../api/visit/models.d';
 
 export class VisitTestSDK {
-    constructor(public app) {
+    constructor(private app, private token) {
+        if (!token) {
+            throw TypeError('PatientTestSDK needs token filled');
+        }
     }
 
     register(visit: IVisit, cb: auth_test_sdk_cb) {
         if (!visit) return cb(new TypeError('visit argument to register must be defined'));
         supertest(this.app)
             .post(`/api/patient/${visit.medicare_no}/visit`)
+            .set({'X-Access-Token': this.token})
             .send(visit)
             .end((err, res) => {
                 if (err) return cb(err);
@@ -27,6 +31,7 @@ export class VisitTestSDK {
         if (!visit) return cb(new TypeError('visit argument to register must be defined'));
         supertest(this.app)
             .delete(`/api/patient/${visit.medicare_no}/visit/${visit.createdAt}`)
+            .set({'X-Access-Token': this.token})
             .send(visit)
             .end((err, res) => {
                 if (err) return cb(err);

@@ -21,7 +21,6 @@ describe('Visit::routes', () => {
         (app, connections) => {
             this.connections = connections;
             this.app = app;
-            this.sdk = new VisitTestSDK(this.app);
             this.patient_mocks = new PatientMocks();
             this.mocks = VisitMocks;
             this.authSDK = new AuthTestSDK(this.app);
@@ -34,6 +33,7 @@ describe('Visit::routes', () => {
                     return done(err);
                 }
                 this.token = responses[1];
+                this.sdk = new VisitTestSDK(this.app, this.token);
                 this.patientSDK = new PatientTestSDK(this.app, this.token);
                 return done();
             });
