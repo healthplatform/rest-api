@@ -1,7 +1,7 @@
 import * as supertest from 'supertest';
 import {expect} from 'chai';
 import * as async from 'async';
-import {cb as auth_test_sdk_cb} from './../auth/auth_test_sdk.d';
+import {cb} from '../../share_interfaces.d';
 import {IVisit} from '../../../api/visit/models.d';
 
 export class VisitTestSDK {
@@ -11,7 +11,7 @@ export class VisitTestSDK {
         }
     }
 
-    register(visit: IVisit, cb: auth_test_sdk_cb) {
+    register(visit: IVisit, cb: cb) {
         if (!visit) return cb(new TypeError('visit argument to register must be defined'));
         supertest(this.app)
             .post(`/api/patient/${visit.medicare_no}/visit`)
@@ -27,7 +27,7 @@ export class VisitTestSDK {
             })
     }
 
-    deregister(visit: IVisit, cb: auth_test_sdk_cb) {
+    deregister(visit: IVisit, cb: cb) {
         if (!visit) return cb(new TypeError('visit argument to register must be defined'));
         supertest(this.app)
             .delete(`/api/patient/${visit.medicare_no}/visit/${visit.createdAt}`)
@@ -41,13 +41,12 @@ export class VisitTestSDK {
             })
     }
 
-    registerManyFaux(visits: {visits: IVisit[]}, cb: auth_test_sdk_cb) {
+    registerManyFaux(visits: {visits: IVisit[]}, cb: cb) {
         if (!visits) return cb(new TypeError('visits argument to registerManyFaux must be defined'));
-
         async.map(visits.visits, this.register, cb);
     }
 
-    deregisterManyFaux(visits: {visits: IVisit[]}, cb: auth_test_sdk_cb) {
+    deregisterManyFaux(visits: {visits: IVisit[]}, cb: cb) {
         if (!visits) return cb(new TypeError('visits argument to deregisterManyFaux must be defined'));
         async.map(visits.visits, this.deregister, cb);
     }

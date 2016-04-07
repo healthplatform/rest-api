@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 import {expect} from 'chai';
-import {cb as auth_test_sdk_cb} from './../auth/auth_test_sdk.d';
+import {cb} from '../../share_interfaces.d';
 import {IPatient} from '../../../api/patient/models.d';
 
 
@@ -11,7 +11,7 @@ export class PatientTestSDK {
         }
     }
 
-    register(patient: IPatient, cb: auth_test_sdk_cb) {
+    register(patient: IPatient, cb: cb) {
         if (!patient) return cb(new TypeError('patient argument to register must be defined'));
         supertest(this.app)
             .post('/api/patient')
@@ -27,7 +27,7 @@ export class PatientTestSDK {
             })
     }
 
-    deregister(patient: IPatient, cb: auth_test_sdk_cb) {
+    deregister(patient: IPatient, cb: cb) {
         if (!patient) return cb(new TypeError('patient argument to deregister must be defined'));
         supertest(this.app)
             .del(`/api/patient/${patient.medicare_no}`)
@@ -41,7 +41,7 @@ export class PatientTestSDK {
             })
     }
 
-    registerMany(patients: {patients: IPatient[]}, cb: auth_test_sdk_cb) {
+    registerMany(patients: {patients: IPatient[]}, cb: cb) {
         if (!patients) return cb(new TypeError('patients argument to registerMany must be defined'));
         supertest(this.app)
             .post('/api/patients')
@@ -61,7 +61,7 @@ export class PatientTestSDK {
             })
     }
 
-    deregisterMany(patients: {patients: IPatient[]}, cb: auth_test_sdk_cb) {
+    deregisterMany(patients: {patients: IPatient[]}, cb: cb) {
         if (!patients) return cb(new TypeError('patients argument to deregisterMany must be defined'));
         supertest(this.app)
             .del(`/api/patients`)

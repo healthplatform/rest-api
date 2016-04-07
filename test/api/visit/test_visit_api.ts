@@ -44,7 +44,7 @@ describe('Visit::routes', () => {
     after(done =>
         async.parallel(Object.keys(this.connections).map(
             connection => this.connections[connection]._adapter.teardown
-        ), (err, _res) => done(err))
+        ), done)
     );
 
     describe('/api/patient/{medicare_no}/visit', () => {

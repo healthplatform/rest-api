@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 import {expect} from 'chai';
-import {cb as auth_test_sdk_cb} from './../auth/auth_test_sdk.d';
+import {cb} from '../../share_interfaces.d';
 import {IPatientHistory} from '../../../api/historic/models.d';
 
 export class HistoricTestSDK {
@@ -10,7 +10,7 @@ export class HistoricTestSDK {
         }
     }
 
-    register(historic: IPatientHistory, cb: auth_test_sdk_cb) {
+    register(historic: IPatientHistory, cb: cb) {
         if (!historic) return cb(new TypeError('historic argument to register must be defined'));
         supertest(this.app)
             .post(`/api/patient/${historic.medicare_no}/historic`)
@@ -27,7 +27,7 @@ export class HistoricTestSDK {
             })
     }
 
-    deregister(historic: IPatientHistory, cb: auth_test_sdk_cb) {
+    deregister(historic: IPatientHistory, cb: cb) {
         if (!historic) return cb(new TypeError('historic argument to register must be defined'));
         supertest(this.app)
             .delete(`/api/patient/${historic.medicare_no}/historic`)

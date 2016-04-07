@@ -6,7 +6,8 @@
 import * as supertest from 'supertest';
 import {expect} from 'chai';
 import * as async from 'async';
-import {ITestSDK, cb as auth_test_sdk_cb} from './auth_test_sdk.d';
+import {ITestSDK} from './auth_test_sdk.d';
+import {cb} from '../../share_interfaces.d';
 import {IUser, IUserBase} from '../../../api/user/models.d';
 import {user_mocks} from '../user/user_mocks';
 import request = require("superagent");
@@ -15,7 +16,7 @@ export class AuthTestSDK implements ITestSDK {
     constructor(public app) {
     }
 
-    register(user: IUserBase, cb: auth_test_sdk_cb) {
+    register(user: IUserBase, cb: cb) {
         if (!user) return cb(new TypeError('user argument to register must be defined'));
         supertest(this.app)
             .post('/api/user')
@@ -30,7 +31,7 @@ export class AuthTestSDK implements ITestSDK {
             });
     }
 
-    login(user: IUserBase, cb: auth_test_sdk_cb) {
+    login(user: IUserBase, cb: cb) {
         if (!user) return cb(new TypeError('user argument to login must be defined'));
         supertest(this.app)
             .post('/api/auth')
@@ -45,7 +46,7 @@ export class AuthTestSDK implements ITestSDK {
             })
     }
 
-    get_user(access_token: string, user: IUser | IUserBase, cb: auth_test_sdk_cb) {
+    get_user(access_token: string, user: IUser | IUserBase, cb: cb) {
         if (!access_token) return cb(new TypeError('access_token argument to get_user must be defined'));
         supertest(this.app)
             .get('/api/user')
@@ -60,7 +61,7 @@ export class AuthTestSDK implements ITestSDK {
             })
     }
 
-    logout(access_token: string, cb: auth_test_sdk_cb) {
+    logout(access_token: string, cb: cb) {
         if (!access_token) return cb(new TypeError('access_token argument to logout must be defined'));
         supertest(this.app)
             .delete('/api/auth')
@@ -69,7 +70,7 @@ export class AuthTestSDK implements ITestSDK {
             .end(cb)
     }
 
-    unregister(ident: { access_token?: string, user_id?: string }, cb: auth_test_sdk_cb) {
+    unregister(ident: { access_token?: string, user_id?: string }, cb: cb) {
         if (!ident) return cb(new TypeError('ident argument to unregister must be defined'));
         if (ident.access_token)
             supertest(this.app)
@@ -85,8 +86,8 @@ export class AuthTestSDK implements ITestSDK {
                 .end(cb)
     }
 
-    unregister_all(users: Array<IUser | IUserBase>, done: auth_test_sdk_cb) {
-        async.map(users, (user, callback) => {
+    unregister_all(users: Array<IUser | IUserBase>, done: cb) {
+        async.map(users, (user, callback) =>
                 async.waterfall([
                     cb => this.login(user, (err, res) =>
                         err ? cb(err) : cb(null, res.body.access_token)
@@ -97,12 +98,11 @@ export class AuthTestSDK implements ITestSDK {
                         )
                     ,
                 ], callback)
-            }
             , done
         )
     }
 
-    register_login(user: IUserBase, done: auth_test_sdk_cb) {
+    register_login(user: IUserBase, done: cb) {
         user = user || user_mocks.successes[0];
         if (!user) {
             return done(new TypeError('user undefined in `register_login`'));
@@ -119,7 +119,7 @@ export class AuthTestSDK implements ITestSDK {
         )
     }
 
-    logout_unregister(user: IUserBase, done: auth_test_sdk_cb) {
+    logout_unregister(user: IUserBase, done: cb) {
         user = user || user_mocks.successes[0];
         if (!user) {
             return done(new TypeError('user undefined in `logout_unregister`'));

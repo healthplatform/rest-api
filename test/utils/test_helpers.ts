@@ -1,9 +1,3 @@
-/// <reference path='./../../typings/restify/restify.d.ts' />
-/// <reference path='./../../typings/supertest/supertest.d.ts' />
-/// <reference path='./../../typings/mocha/mocha.d.ts' />
-/// <reference path='./../../typings/chai/chai.d.ts' />
-/// <reference path='./../../typings/async/async.d.ts' />
-
 import {expect} from 'chai';
 import {binarySearch, isShallowSubset, uri_to_config} from './../../utils/helpers';
 
@@ -13,19 +7,19 @@ describe('utils::helpers', () => {
         const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         const comparator = (a, b) => a > b;
 
-        it('should find each element', () => {
-            array.map(elem => expect(binarySearch(array, elem, comparator)).to.be.gt(-1));
-        });
+        it('should find each element', () =>
+            array.map(elem => expect(binarySearch(array, elem, comparator)).to.be.gt(-1))
+        );
 
-        it('should not find an element', () => {
+        it('should not find an element', () =>
             [50, -1, 0, null, 'hello', undefined, '', NaN, {}, []].map(
                 elem => expect(binarySearch(array, elem, comparator)).to.be.lte(-1)
-            );
-        });
+            )
+        );
 
-        it('should handle empty list', () => {
-            expect(binarySearch([], 5, comparator)).to.be.lte(-1);
-        });
+        it('should handle empty list', () =>
+            expect(binarySearch([], 5, comparator)).to.be.lte(-1)
+        );
     });
 
     describe('isShallowSubset', () => {
@@ -73,8 +67,8 @@ describe('utils::helpers', () => {
                 );
 
                 it('experienced with two different, different sized lists', () => {
-                    expect(isShallowSubset([7, 1, 2, 5], [10, 35, 2, 2, 5])).to.be.false;
-                    expect(isShallowSubset([1, 2, 5, 6], [2, 2, 5])).to.be.false;
+                    it('list 0', () => expect(isShallowSubset([7, 1, 2, 5], [10, 35, 2, 2, 5])).to.be.false);
+                    it('list 1', () => expect(isShallowSubset([1, 2, 5, 6], [2, 2, 5])).to.be.false);
                 });
 
                 it('experienced with array_0.length > array_1.length', () =>
@@ -125,24 +119,23 @@ describe('utils::helpers', () => {
     });
 
     describe('uri_to_config', () => {
-        it('should work with full', () => {
+        it('should work with full', () =>
             expect(uri_to_config('postgresql://postgres:postgres@localhost/postgres')).to.deep.equal({
                 "database": "postgres",
                 "host": "localhost",
                 "identity": "postgres",
                 "password": "postgres",
                 "user": "postgres",
-            });
+            })
+        );
 
-        });
-
-        it('should work with minimal', () => {
+        it('should work with minimal', () =>
             expect(uri_to_config('postgresql://localhost')).to.deep.equal({
                 "host": "localhost",
                 "identity": "postgres",
                 "user": "postgres"
-            });
-        });
+            })
+        );
 
         /*
          it('should work with proto+host+user', () => {

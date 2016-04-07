@@ -1,4 +1,5 @@
 import {IUserBase, IUser} from '../../../api/user/models.d';
+import {cb} from '../../share_interfaces.d';
 
 export interface ITestSDK {
     register(user: IUserBase | IUser, cb: cb): void;
@@ -9,8 +10,4 @@ export interface ITestSDK {
     unregister_all(users: Array<IUser | IUserBase>, done: cb);
     register_login(user: IUserBase, done: cb);
     logout_unregister(user: IUserBase, done: cb);
-}
-
-export interface cb {
-    (err: Error, res?: any): void;
 }

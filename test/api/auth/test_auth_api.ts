@@ -24,7 +24,7 @@ describe('Auth::routes', () => {
     after(done =>
         async.parallel(Object.keys(this.connections).map(
             connection => this.connections[connection]._adapter.teardown
-        ), (err, _res) => done(err))
+        ), done)
     );
 
     describe('/api/auth', () => {
@@ -43,7 +43,7 @@ describe('Auth::routes', () => {
         it('DELETE should logout user', (done) => {
             const sdk: ITestSDK = this.sdk;
             async.waterfall([
-                    (cb) => this.sdk.register(user_mocks.successes[1], cb),
+                    cb => this.sdk.register(user_mocks.successes[1], cb),
                     (_, cb) => sdk.login(user_mocks.successes[1], (err, res) =>
                         err ? cb(err) : cb(null, res.body.access_token)
                     ),
@@ -57,7 +57,7 @@ describe('Auth::routes', () => {
                             cb(!e ? new Error("Access token wasn't invalidated/removed") : null)
                         )
                 ],
-                (err, results) => done(err)
+                done
             )
         });
     });

@@ -1,12 +1,5 @@
-/// <reference path='./../../../typings/restify/restify.d.ts' />
-/// <reference path='./../../../typings/supertest/supertest.d.ts' />
-/// <reference path='./../../../typings/mocha/mocha.d.ts' />
-/// <reference path='./../../../typings/chai/chai.d.ts' />
-
 import * as supertest from 'supertest';
-import * as restify from 'restify';
 import {expect} from 'chai';
-
 import {main} from './../../../main';
 
 describe('Root::routes', () => {
@@ -15,7 +8,7 @@ describe('Root::routes', () => {
             {},
             app => {
                 this.app = app;
-                done();
+                return done();
             },
             true
         )
