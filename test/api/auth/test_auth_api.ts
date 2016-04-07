@@ -29,15 +29,14 @@ describe('Auth::routes', () => {
 
     describe('/api/auth', () => {
         beforeEach(done => this.sdk.unregister_all(user_mocks.successes, () => done()));
-        afterEach(done => this.sdk.unregister_all(user_mocks.successes,  () => done()));
+        afterEach(done => this.sdk.unregister_all(user_mocks.successes, () => done()));
 
         it('POST should login user', (done) => {
-            const sdk: ITestSDK = this.sdk;
-            async.waterfall([
-                    (cb) => this.sdk.register(user_mocks.successes[0], cb),
-                    (_, cb) => sdk.login(user_mocks.successes[0], cb)
+            async.series([
+                    cb => this.sdk.register(user_mocks.successes[1], cb),
+                    cb => this.sdk.login(user_mocks.successes[1], cb)
                 ],
-                (err, results) => done(err)
+                done
             );
         });
 

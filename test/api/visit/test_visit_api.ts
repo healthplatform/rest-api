@@ -5,8 +5,11 @@ import {PatientTestSDK} from './../patient/patient_test_sdk';
 import {VisitMocks} from './visit_mocks';
 import {PatientMocks} from '../patient/patient_mocks';
 import {IVisit} from '../../../api/visit/models.d';
+import {AuthTestSDK} from '../auth/auth_test_sdk';
 
 const models_and_routes: helpers.IModelRoute = {
+    user: all_models_and_routes['user'],
+    auth: all_models_and_routes['auth'],
     contact: all_models_and_routes['contact'],
     patient: all_models_and_routes['patient'],
     kv: all_models_and_routes['kv'],
@@ -14,54 +17,53 @@ const models_and_routes: helpers.IModelRoute = {
 };
 
 describe('Visit::routes', () => {
-    const self = this;
     before(done => main(models_and_routes,
         (app, connections) => {
-            self.connections = connections;
-            self.app = app;
-            self.sdk = new VisitTestSDK(self.app);
-            self.patient_mocks = new PatientMocks();
-            self.mocks = VisitMocks;
+            this.connections = connections;
+            this.app = app;
+            this.sdk = new VisitTestSDK(this.app);
+            this.patient_mocks = new PatientMocks();
+            this.mocks = VisitMocks;
+            this.authSDK = new AuthTestSDK(this.app);
 
-            async.waterfall([
+            async.series([
                 cb => this.authSDK.logout_unregister(undefined, () => cb()),
                 cb => this.authSDK.register_login(undefined, cb)
-            ], (err, token) => {
+            ], (err, responses: Array<string>) => {
                 if (err) {
                     return done(err);
                 }
-                self.token = token;
-                self.patientSDK = new PatientTestSDK(self.app, self.token);
+                this.token = responses[1];
+                this.patientSDK = new PatientTestSDK(this.app, this.token);
                 return done();
             });
-            done();
         }
     ));
 
     // Deregister database adapter connections
     after(done =>
-        async.parallel(Object.keys(self.connections).map(
-            connection => self.connections[connection]._adapter.teardown
+        async.parallel(Object.keys(this.connections).map(
+            connection => this.connections[connection]._adapter.teardown
         ), (err, _res) => done(err))
     );
 
     describe('/api/patient/{medicare_no}/visit', () => {
         beforeEach(done =>
-            self.patient_sdk.deregister(self.patient_mocks.patients[0], () =>
-                self.patient_sdk.register(self.patient_mocks.patients[0], done)
+            this.patientSDK.deregister(this.patient_mocks.patients[0], () =>
+                this.patientSDK.register(this.patient_mocks.patients[0], done)
             )
         );
 
         afterEach(done =>
-            self.sdk.deregister(self.mocks[0], err =>
-                err && done(err) || self.patient_sdk.deregister(self.patient_mocks.patients[0], done)
+            this.sdk.deregister(this.mocks[0], err =>
+                err && done(err) || this.patientSDK.deregister(this.patient_mocks.patients[0], done)
             )
         );
 
         it('POST should create Visit', (done) => {
-            self.sdk.register(self.mocks[0], (err, visit: IVisit) => {
+            this.sdk.register(this.mocks[0], (err, visit: IVisit) => {
                 if (err) return done(err);
-                self.mocks[0].createdAt = visit.createdAt;
+                this.mocks[0].createdAt = visit.createdAt;
                 return done();
             })
         });
@@ -69,23 +71,22 @@ describe('Visit::routes', () => {
 
     describe('[FAUX] /api/patient/{medicare_no}/visits', () => {
         beforeEach(done =>
-            self.patient_sdk.deregisterMany(self.patient_mocks, () =>
-                self.patient_sdk.registerMany(self.patient_mocks, done)
+            this.patientSDK.deregisterMany(this.patient_mocks, () =>
+                this.patientSDK.registerMany(this.patient_mocks, done)
             )
         );
 
         afterEach(done =>
-            self.sdk.deregisterManyFaux(self.mocks, err =>
-                err && done(err) || self.patient_sdk.deregister(self.patient_mocks.patients[0], done)
+            this.sdk.deregisterManyFaux(this.mocks, err =>
+                err && done(err) || this.patientSDK.deregister(this.patient_mocks.patients[0], done)
             )
         );
 
         it('POST should create many Visit', (done) => {
-            self.sdk.registerManyFaux(self.mocks, (err, visits: IVisit[]) => {
+            this.sdk.registerManyFaux(this.mocks, (err, visits: IVisit[]) => {
                 if (err) return done(err);
-                console.log('visits =', visits);
                 for (let i = 0; i < visits.length; i++)
-                    self.mocks[i].createdAt = visits[i].createdAt;
+                    this.mocks[i].createdAt = visits[i].createdAt;
 
                 return done();
             })

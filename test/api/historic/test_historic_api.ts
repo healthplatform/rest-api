@@ -1,6 +1,6 @@
 import * as async from 'async';
 import {main, all_models_and_routes} from './../../../main';
-import {test_sdk} from './historic_test_sdk';
+import {HistoricTestSDK} from './historic_test_sdk';
 import {PatientTestSDK} from './../patient/patient_test_sdk';
 import {PatientMocks} from './../patient/patient_mocks';
 import {HistoricMocks} from './historic_mocks';
@@ -15,27 +15,24 @@ const models_and_routes: helpers.IModelRoute = {
 };
 
 describe('Historic::routes', () => {
-    const self = this;
     before(done => main(models_and_routes,
         (app, connections) => {
             this.connections = connections;
             this.app = app;
-            this.sdk = test_sdk(self.app);
             this.patient_mocks = new PatientMocks();
             this.mocks = HistoricMocks;
             this.authSDK = new AuthTestSDK(this.app);
 
-            console.info('about to call async.waterfall()');
-
-            async.waterfall([
+            async.series([
                 cb => this.authSDK.logout_unregister(undefined, () => cb()),
                 cb => this.authSDK.register_login(undefined, cb)
-            ], (err, token) => {
+            ], (err, responses: Array<string>) => {
                 if (err) {
                     return done(err);
                 }
-                this.token = token;
+                this.token = responses[1];
                 this.patientSDK = new PatientTestSDK(this.app, this.token);
+                this.sdk = new HistoricTestSDK(this.app, this.token);
                 return done();
             });
         }
@@ -43,29 +40,29 @@ describe('Historic::routes', () => {
 
     // Deregister database adapter connections
     after(done =>
-        self.connections && async.parallel(Object.keys(self.connections).map(
-            connection => self.connections[connection]._adapter.teardown
+        this.connections && async.parallel(Object.keys(this.connections).map(
+            connection => this.connections[connection]._adapter.teardown
         ), done)
     );
 
     describe('/api/patient/{medicare_no}/historic', () => {
         beforeEach(done =>
             async.series([
-                cb => self.patient_sdk.deregister(self.patient_mocks.patients[0], () => cb()),
-                cb => self.patient_sdk.register(self.patient_mocks.patients[0], cb)
+                cb => this.patientSDK.deregister(this.patient_mocks.patients[0], () => cb()),
+                cb => this.patientSDK.register(this.patient_mocks.patients[0], cb)
             ], done)
         );
 
         afterEach(done =>
             async.series([
-                cb => self.sdk.deregister(self.mocks[0], cb),
-                cb => self.patient_sdk.deregister(self.patient_mocks.patients[0], cb)
+                cb => this.sdk.deregister(this.mocks[0], cb),
+                cb => this.patientSDK.deregister(this.patient_mocks.patients[0], cb)
             ], done)
         );
 
 
         it('POST should create Historic', (done) => {
-            self.sdk.register(self.mocks[0], done);
+            this.sdk.register(this.mocks[0], done);
         });
     });
 });

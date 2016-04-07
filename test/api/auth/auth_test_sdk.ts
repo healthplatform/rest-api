@@ -9,6 +9,7 @@ import * as async from 'async';
 import {ITestSDK, cb as auth_test_sdk_cb} from './auth_test_sdk.d';
 import {IUser, IUserBase} from '../../../api/user/models.d';
 import {user_mocks} from '../user/user_mocks';
+import request = require("superagent");
 
 export class AuthTestSDK implements ITestSDK {
     constructor(public app) {
@@ -16,17 +17,14 @@ export class AuthTestSDK implements ITestSDK {
 
     register(user: IUserBase, cb: auth_test_sdk_cb) {
         if (!user) return cb(new TypeError('user argument to register must be defined'));
-        console.log('Calling AuthTestSDK.register with:', user, cb);
         supertest(this.app)
             .post('/api/user')
             .send(user)
             .expect('Content-Type', /json/)
-            .expect(201)
             .end((err, res) => {
-                console.error('AuthTestSDK.register err =', err);
-                console.log('AuthTestSDK.register res =', res);
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
+                expect(res.statusCode).to.be.equal(201);
                 expect(Object.keys(res.body).sort()).to.deep.equal(['createdAt', 'email', 'updatedAt']);
                 return cb(err, res);
             });
@@ -88,23 +86,19 @@ export class AuthTestSDK implements ITestSDK {
     }
 
     unregister_all(users: Array<IUser | IUserBase>, done: auth_test_sdk_cb) {
-        const self = this;
-
-        function f(user, callback) {
-            return async.waterfall([
-                cb => self.login(user, (err, res) =>
-                    err ? cb(err) : cb(null, res.body.access_token)
-                ),
-                (access_token, cb) =>
-                    self.unregister({access_token: access_token}, (err, res) =>
-                        cb(err, access_token)
-                    )
-                ,
-            ], callback);
-        }
-
-        async.map(users, f,
-            done
+        async.map(users, (user, callback) => {
+                async.waterfall([
+                    cb => this.login(user, (err, res) =>
+                        err ? cb(err) : cb(null, res.body.access_token)
+                    ),
+                    (access_token, cb) =>
+                        this.unregister({access_token: access_token}, (err, res) =>
+                            cb(err, access_token)
+                        )
+                    ,
+                ], callback)
+            }
+            , done
         )
     }
 
@@ -113,17 +107,14 @@ export class AuthTestSDK implements ITestSDK {
         if (!user) {
             return done(new TypeError('user undefined in `register_login`'));
         }
-        console.log('IN register_login');
-        async.waterfall([
-                cb => this.register(user, (err, res) => {
-                    console.info('register_login::register::res =', res);
-                    return cb(err, res);
-                }),
+        async.series([
+                cb => this.register(user, cb),
                 cb => this.login(user, cb)
-            ], (err, res) => {
-                err && console.error('register_login::err =', err);
-                res && console.info('register_login::res =', res);
-                return done(err, res)
+            ], (err, results: Array<request.Response>) => {
+                if (err) {
+                    return done(err);
+                }
+                return done(err, results[1].get('x-access-token'));
             }
         )
     }

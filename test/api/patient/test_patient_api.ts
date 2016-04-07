@@ -19,14 +19,14 @@ describe('Patient::routes', () => {
             this.mocks = new PatientMocks();
             this.authSDK = new AuthTestSDK(this.app);
 
-            async.waterfall([
+            async.series([
                 cb => this.authSDK.logout_unregister(undefined, () => cb()),
                 cb => this.authSDK.register_login(undefined, cb)
-            ], (err, token) => {
+            ], (err, responses: Array<string>) => {
                 if (err) {
                     return done(err);
                 }
-                this.token = token;
+                this.token = responses[1];
                 this.sdk = new PatientTestSDK(this.app, this.token);
                 return done();
             });
@@ -36,7 +36,7 @@ describe('Patient::routes', () => {
 
     // Deregister database adapter connections
     after(done =>
-        async.waterfall([
+        async.series([
                 cb => this.authSDK.logout_unregister(undefined, cb),
                 cb => async.parallel(Object.keys(this.connections).map(
                     connection => this.connections[connection]._adapter.teardown

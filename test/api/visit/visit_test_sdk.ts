@@ -4,15 +4,13 @@ import * as async from 'async';
 import {cb as auth_test_sdk_cb} from './../auth/auth_test_sdk.d';
 import {IVisit} from '../../../api/visit/models.d';
 
-var g_app;
 export class VisitTestSDK {
     constructor(public app) {
-        g_app = app;
     }
 
     register(visit: IVisit, cb: auth_test_sdk_cb) {
         if (!visit) return cb(new TypeError('visit argument to register must be defined'));
-        supertest(this ? this.app : g_app)
+        supertest(this.app)
             .post(`/api/patient/${visit.medicare_no}/visit`)
             .send(visit)
             .end((err, res) => {
