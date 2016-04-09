@@ -6,7 +6,7 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
     },
     "lodash/lodash.d.ts": {
       "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
@@ -58,6 +58,21 @@
     },
     "redis/redis.d.ts": {
       "commit": "9ec8be78f815b89ab78ab539e6d6676a7cf2baed"
+    },
+    "multiparty/multiparty.d.ts": {
+      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+    },
+    "express/express.d.ts": {
+      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+    },
+    "express-serve-static-core/express-serve-static-core.d.ts": {
+      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+    },
+    "mime/mime.d.ts": {
+      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
     }
   }
 }

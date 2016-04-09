@@ -1,9 +1,3 @@
-/// <reference path='./cust_typings/waterline.d.ts' />
-/// <reference path='./cust_typings/sails-postgresql.d.ts' />
-/// <reference path='./typings/redis/redis.d.ts' />
-/// <reference path='./typings/bunyan/bunyan.d.ts' />
-/// <reference path='./utils/helpers.d.ts' />
-
 import * as async from 'async';
 import * as restify from 'restify';
 import * as redis from 'redis';
@@ -12,12 +6,16 @@ import * as sails_postgresql from 'sails-postgresql';
 import {createLogger} from 'bunyan';
 import {trivial_merge, uri_to_config, populateModelRoutes} from './utils/helpers';
 import {SampleData} from './utils/SampleData';
+import * as multiparty from 'connect-multiparty';
 
 const package_ = require('./package');
 const logger = createLogger({
     name: 'main'
 });
-// Merge custom errors
+
+type middleware = (req: restify.Request, res: restify.Response, next: restify.Next) => void;
+export const multipartyMiddleware: middleware = multiparty();
+
 
 if (!process.env.NO_DEBUG) {
     var i = {};
@@ -71,8 +69,22 @@ export function main(models_and_routes: helpers.IModelRoute,
     // Init server obj
     let app = restify.createServer();
     const root: string = '/api';
+
     app.use(restify.queryParser());
-    app.use(restify.bodyParser());
+    app.use(restify.bodyParser(/*{
+        multipartHandler: function (part) {
+            const buffer = new Buffer([]);
+            part.on('data', function (data) {
+                console.log('Received', data);
+            });
+        },
+        multipartFileHandler: function (part) {
+            const buffer = new Buffer([]);
+            part.on('data', function (data) {
+                console.log('Received', data);
+            });
+        }
+    }*/));
     app.on('after', restify.auditLogger({
         log: createLogger({
             name: 'audit',

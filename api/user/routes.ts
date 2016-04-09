@@ -1,10 +1,3 @@
-/// <reference path='./../../typings/restify/restify.d.ts' />
-/// <reference path='./../../typings/tv4/tv4.d.ts' />
-/// <reference path='./../../cust_typings/waterline.d.ts' />
-/// <reference path='./../../typings/async/async.d.ts' />
-/// <reference path='./models.d.ts' />
-/// <reference path='./../../utils/errors.d.ts'/>
-
 import * as restify from 'restify';
 import * as async from 'async';
 import {has_body, mk_valid_body_mw, mk_valid_body_mw_ignore, remove_from_body} from './../../utils/validators';

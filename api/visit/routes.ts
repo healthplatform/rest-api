@@ -1,21 +1,38 @@
 import * as restify from 'restify';
 import {NotFoundError} from 'restify';
 import {has_body} from './../../utils/validators';
-import {collections} from './../../main';
+import {collections, multipartyMiddleware} from './../../main';
 import {fmtError} from './../../utils/helpers';
 import {IVisit} from './models.d.ts';
 import {fetchVisit, fetchVisits, IVisitFetchRequest, IVisitsFetchRequest} from './middleware';
 import {has_auth} from '../auth/middleware';
 
 
+interface createReq extends restify.Request {
+    files: {
+        file: {
+            name: string;
+            type: string;
+        }
+    }
+}
+
 export function create(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
-    app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, has_auth(), //mk_valid_body_mw(user_schema),
-        function (req: restify.Request, res: restify.Response, next: restify.Next) {
+    app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, has_auth(),
+        //multipartyMiddleware, //mk_valid_body_mw(user_schema),
+        function (req: createReq, res: restify.Response, next: restify.Next) {
             const Visit: waterline.Query = collections['visit_tbl'],
                 Patient: waterline.Query = collections['patient_tbl'];
 
+            /*
+            var file = req.files.file;
+            console.log('file.name =', file.name);
+            console.log('file.type =', file.type);
+            */
+
+            console.info('req.body =', req.body);
             req.body.medicare_no = req.params.medicare_no;
 
             Patient.count({medicare_no: req.body.medicare_no}, (err, count) => {
@@ -26,10 +43,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
                 } else if (!count) {
                     return next(new NotFoundError('patient'));
                 } else {
-                    Visit.create({
-                        medicare_no: req.params.medicare_no,
-                        iop_left_eye: 5
-                    }).exec((error, visit: IVisit) => {
+                    Visit.create(req.body).exec((error, visit: IVisit) => {
                         if (error) {
                             const e: errors.CustomError = fmtError(error);
                             res.send(e.statusCode, e.body);

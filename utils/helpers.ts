@@ -1,7 +1,3 @@
-/// <reference path='./../typings/node/node.d.ts' />
-/// <reference path='./../typings/restify/restify.d.ts' />
-/// <reference path='./../cust_typings/waterline.d.ts' />
-
 import {RestError} from 'restify';
 import * as errors from './errors';
 import {readdirSync, statSync} from 'fs';
