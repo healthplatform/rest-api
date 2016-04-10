@@ -11,8 +11,12 @@ export interface IStorageFetchRequest extends restify.Request {
 export function fetchStorage(req: IStorageFetchRequest, res: restify.Response, next: restify.Next) {
     const Storage: waterline.Query = collections['storage_tbl'];
 
+    if (req.params.filename === undefined) {
+        return next(new NotFoundError('filename in url is undefined'));
+    }
+
     Storage.findOne({
-        uploader: req.params.uploader,
+        uploader: req.params.uploader, // TODO: match with access-token user_id
         name: `${req.params.uploader}/${req.params.filename}`
     }).exec((error, storage: IStorage) => {
         if (error) {
