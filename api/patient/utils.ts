@@ -21,12 +21,17 @@ export function createPatient(newPatient: IPatientBase,
     if (!b_contact) return callback(new NotFoundError('patient.contact'));
 
     async.waterfall([
-        cb => Contact.findOrCreate(b_contact).exec((err, contact: IContact) =>
-            cb(contact ? err : err || new NotFoundError('patient.contact'), contact.id)
+        cb => Contact.findOrCreate(b_contact).exec((err, contact: IContact) => {
+                if (err) return cb(err);
+                else if (!contact) return cb(new NotFoundError('patient.contact'));
+                return cb(null, contact.id);
+            }
         ),
-        (b_contactId: string, cb) => gp ? Contact.findOrCreate(gp).exec((err, contact: IContact) =>
-            cb(contact ? err : err || new NotFoundError('patient.gp'), b_contactId, contact.id)
-        ) : cb(null, b_contactId, null),
+        (b_contactId: string, cb) => gp ? Contact.findOrCreate(gp).exec((err, contact: IContact) => {
+            if (err) return cb(err);
+            else if (!contact) return cb(new NotFoundError('gp.contact'));
+            return cb(null, b_contactId, contact.id);
+        }) : cb(null, b_contactId, null),
         (b_contactId: string, gpId: string, cb) => other_specialists && other_specialists.length ?
             async.map(other_specialists,
                 (specialist, _cb) => Contact.findOrCreate(specialist, _cb),

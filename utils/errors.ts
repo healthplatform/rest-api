@@ -47,4 +47,4 @@ export function WaterlineError(wl_error: waterline.WLError, statusCode = 400) {
     }
     );
 }
-inherits(NotFoundError, RestError);
+inherits(WaterlineError, RestError);
