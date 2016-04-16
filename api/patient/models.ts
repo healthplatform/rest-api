@@ -28,6 +28,10 @@ export const Patient = {
         ethnicity: {
             type: 'string'
         },
+        visits: {
+            collection: 'visit_tbl',
+            via: 'medicare_no'
+        },
         toJSON: function toJSON() {
             let patient: IPatient = this.toObject();
             for (const key in patient)

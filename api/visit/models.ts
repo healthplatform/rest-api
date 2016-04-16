@@ -12,6 +12,10 @@ export const Visit = {
                 return next(fmtError(err));
             else if (!count)
                 return next(new NotFoundError('patient'));
+
+            visit.id = visit.medicare_no + visit.createdAt;
+
+            return next();
         });
     },
     toJSON: function toJSON() {
@@ -21,8 +25,9 @@ export const Visit = {
         return visit;
     },
     attributes: {
-        medicare_no: {
+        id: {
             required: true,
+            primaryKey: true,
             type: 'string'
         },
         acuity_left_eye_num: {
@@ -57,6 +62,14 @@ export const Visit = {
         },
         iop_right_eye: {
             type: 'integer'
+        },
+        medicare_no: {
+            required: true,
+            type: 'string'
+        },
+        prognoses: {
+            collection: 'prognosis_tbl',
+            via: 'medicare_no'
         },
         reason: {
             type: 'string'
