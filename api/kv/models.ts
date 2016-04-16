@@ -1,5 +1,7 @@
 // Should really use the Postgres KV feature
 // ... also I do have Redis...
+import {IKV} from './models.d';
+
 export const KV = {
     identity: 'kv_tbl',
     connection: 'postgres',
@@ -13,11 +15,11 @@ export const KV = {
             type: 'string',
             required: true
         },
-        toJSON: function toJSON(): JSON {
-            let visit = this.toObject();
-            for (const key in visit)
-                if (!visit[key]) delete visit[key];
-            return visit;
+        toJSON: function toJSON() {
+            let kv: IKV = this.toObject();
+            for (const key in kv)
+                if (kv.hasOwnProperty(key) && !kv[key]) delete kv[key];
+            return kv;
         }
     }
 };

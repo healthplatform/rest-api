@@ -1,3 +1,5 @@
+import {IPatientHistory} from './models.d';
+
 export const Historic = {
     identity: 'patient_historic_tbl',
     connection: 'postgres',
@@ -29,19 +31,19 @@ export const Historic = {
             type: 'numeric'
         },
         /*
-        allergies: {
-            type: 'array',
-            'items': {
-                type: 'string'
-            }
-        },
-        current_medication: {
-            type: 'array',
-            items: {
-                type: 'string'
-            }
-        },
-        */
+         allergies: {
+         type: 'array',
+         'items': {
+         type: 'string'
+         }
+         },
+         current_medication: {
+         type: 'array',
+         items: {
+         type: 'string'
+         }
+         },
+         */
         eyedrop_intolerance: {
             type: 'string'
         },
@@ -51,11 +53,11 @@ export const Historic = {
         ethnicity: {
             type: 'string'
         },
-        toJSON: function toJSON(): JSON {
-            let visit = this.toObject();
-            for (const key in visit)
-                if (!visit[key]) delete visit[key];
-            return visit;
+        toJSON: function toJSON() {
+            let historic: IPatientHistory = this.toObject();
+            for (const key in historic)
+                if (historic.hasOwnProperty(key) && !historic[key]) delete historic[key];
+            return historic;
         }
     }
 };

@@ -1,3 +1,5 @@
+import {IStorage} from './models.d';
+
 export const Storage = {
     identity: 'storage_tbl',
     connection: 'postgres',
@@ -23,11 +25,11 @@ export const Storage = {
         mime_type: {
             type: 'string'
         },
-        toJSON: function toJSON(): JSON {
-            let visit = this.toObject();
-            for (const key in visit)
-                if (!visit[key]) delete visit[key];
-            return visit;
+        toJSON: function toJSON() {
+            let storage: IStorage = this.toObject();
+            for (const key in storage)
+                if (storage.hasOwnProperty(key) && !storage[key]) delete storage[key];
+            return storage;
         }
     }
 };

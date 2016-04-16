@@ -1,3 +1,5 @@
+import {IPatient} from './models.d';
+
 export const Patient = {
     identity: 'patient_tbl',
     connection: 'postgres',
@@ -26,11 +28,11 @@ export const Patient = {
         ethnicity: {
             type: 'string'
         },
-        toJSON: function toJSON(): JSON {
-            let visit = this.toObject();
-            for (const key in visit)
-                if (!visit[key]) delete visit[key];
-            return visit;
+        toJSON: function toJSON() {
+            let patient: IPatient = this.toObject();
+            for (const key in patient)
+                if (patient.hasOwnProperty(key) && !patient[key]) delete patient[key];
+            return patient;
         }
     }
 };

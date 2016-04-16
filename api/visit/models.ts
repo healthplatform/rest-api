@@ -1,6 +1,6 @@
 import {collections} from '../../main';
 import {IVisit} from './models.d';
-import {NotFoundError} from './../../utils/errors';
+import {NotFoundError, fmtError} from './../../utils/errors';
 
 export const Visit = {
     identity: 'visit_tbl',
@@ -8,17 +8,16 @@ export const Visit = {
     beforeCreate: function beforeCreate(visit: IVisit, next) {
         const Patient: waterline.Query = collections['patient_tbl'];
         Patient.count({medicare_no: visit.medicare_no}, (err, count) => {
-            if (err) {
-                return next(err);
-            } else if (!count) {
+            if (err)
+                return next(fmtError(err));
+            else if (!count)
                 return next(new NotFoundError('patient'));
-            }
         });
     },
-    toJSON: function toJSON(): JSON {
-        let visit = this.toObject();
+    toJSON: function toJSON() {
+        let visit: IVisit = this.toObject();
         for (const key in visit)
-            if (!visit[key]) delete visit[key];
+            if (visit.hasOwnProperty(key) && !visit[key]) delete visit[key];
         return visit;
     },
     attributes: {
