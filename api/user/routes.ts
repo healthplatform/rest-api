@@ -2,8 +2,8 @@ import * as restify from 'restify';
 import * as async from 'async';
 import {has_body, mk_valid_body_mw, mk_valid_body_mw_ignore, remove_from_body} from './../../utils/validators';
 import {collections} from './../../main';
-import {fmtError, isShallowSubset} from './../../utils/helpers';
-import {NotFoundError} from './../../utils/errors';
+import {isShallowSubset} from './../../utils/helpers';
+import {NotFoundError, fmtError} from './../../utils/errors';
 import {has_auth} from './../auth/middleware';
 import {AccessToken} from './../auth/models';
 import {IUser} from './models.d';
@@ -16,11 +16,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
             const User: waterline.Query = collections['user_tbl'];
 
             User.create(req.body).exec((error, user: IUser) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.setHeader('X-Access-Token', AccessToken().add(req.body.email, 'login'));
                 res.json(201, user);
                 return next();
@@ -71,12 +67,7 @@ export function update(app: restify.Server, namespace: string = ""): void {
                 (user, cb) =>
                     User.update(user, req.body, (e, r: IUser) => cb(e, r[0]))
             ], (error, result) => {
-                // next.ifError(fmtError(error));
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.json(200, result);
                 return next()
             });
@@ -93,12 +84,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
                 cb => AccessToken().logout({user_id: req['user_id']}, cb),
                 cb => User.destroy({email: req['user_id']}, cb)
             ], (error) => {
-                // next.ifError(fmtError(error));
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.send(204);
                 return next()
             });

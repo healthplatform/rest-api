@@ -1,6 +1,26 @@
+import {collections} from '../../main';
+import {IVisit} from './models.d';
+import {NotFoundError} from './../../utils/errors';
+
 export const Visit = {
     identity: 'visit_tbl',
     connection: 'postgres',
+    beforeCreate: function beforeCreate(visit: IVisit, next) {
+        const Patient: waterline.Query = collections['patient_tbl'];
+        Patient.count({medicare_no: visit.medicare_no}, (err, count) => {
+            if (err) {
+                return next(err);
+            } else if (!count) {
+                return next(new NotFoundError('patient'));
+            }
+        });
+    },
+    toJSON: function toJSON(): JSON {
+        let visit = this.toObject();
+        for (const key in visit)
+            if (!visit[key]) delete visit[key];
+        return visit;
+    },
     attributes: {
         medicare_no: {
             required: true,
@@ -59,7 +79,7 @@ export const Visit = {
         },
         vf_right_eye: {
             type: 'string'
-        },
+        }
 
         /*
          additional_left_eye: {
@@ -71,11 +91,5 @@ export const Visit = {
          via: 'key'
          },
          */
-        toJSON: function toJSON(): JSON {
-            let visit = this.toObject();
-            for (const key in visit)
-                if (!visit[key]) delete visit[key];
-            return visit;
-        }
     }
 };

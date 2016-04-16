@@ -2,16 +2,14 @@ import * as async from 'async';
 import * as restify from 'restify';
 import {has_body} from '../../utils/validators';
 import {collections} from '../../main';
-import {fmtError} from '../../utils/helpers';
 import {IPatient} from './models.d';
 import {IContact} from '../contact/models.d';
-import {NotFoundError} from '../../utils/errors';
+import {NotFoundError, fmtError} from '../../utils/errors';
 import {createPatient} from './utils';
 import {fetchPatient, IPatientFetchRequest} from './middleware';
 import {fetchHistoric, IPatientHistoryFetchRequest} from './../historic/middleware';
 import {fetchVisits, IVisitsFetchRequest} from './../visit/middleware';
 import {has_auth} from '../auth/middleware';
-
 import CustomError = errors.CustomError;
 
 
@@ -19,12 +17,9 @@ export function create(app: restify.Server, namespace: string = ""): void {
     app.post(namespace, has_body, has_auth(), //mk_valid_body_mw(user_schema),
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             type IResult = [IContact, IPatient];
+            console.info('req.body =', req.body);
             createPatient(req.body, (error, results: IResult) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
 
                 res.json(201, results);
                 return next();
@@ -48,16 +43,11 @@ export function del(app: restify.Server, namespace: string = ""): void {
             const Patient: waterline.Query = collections['patient_tbl'];
 
             // Don't delete Contact, even with no Patient, Contact may prove useful whence persisted
-            Patient.destroy({medicare_no: req.params.medicare_no}).exec(
-                (error) => {
-                    if (error) {
-                        const e: errors.CustomError = fmtError(error);
-                        res.send(e.statusCode, e.body);
-                        return next();
-                    }
-                    res.send(204);
-                    return next();
-                });
+            Patient.destroy({medicare_no: req.params.medicare_no}).exec(error => {
+                next.ifError(fmtError(error));
+                res.send(204);
+                return next();
+            });
         }
     );
 }
@@ -74,11 +64,7 @@ export function batchGet(app: restify.Server, namespace: string = ""): void {
                     .populate('other_specialists');
 
             q.exec((error, patients) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.json({'patients': patients});
                 return next();
             });
@@ -92,12 +78,7 @@ export function batchCreate(app: restify.Server, namespace: string = ""): void {
             type IResult = Array<[IContact, IPatient]>;
 
             async.mapLimit(req.body.patients, 1, createPatient, (error, results: IResult) => {
-                if (error) {
-                    console.error(error);
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
 
                 res.json(201, {patients: results});
                 return next();
@@ -106,11 +87,7 @@ export function batchCreate(app: restify.Server, namespace: string = ""): void {
 
             /*
              Patient.createEach(req.body.patients).exec((error, patients: Array<IPatient>) => {
-             if (error) {
-             const e: errors.CustomError = fmtError(error);
-             res.send(e.statusCode, e.body);
-             return next();
-             }
+             next.ifError(fmtError(error));
              res.json(201, {'patients': patients});
              return next();
              });
@@ -126,11 +103,7 @@ export function batchDelete(app: restify.Server, namespace: string = ""): void {
 
             if (!req.body.patients) return next(new NotFoundError('patients key on body'));
             Patient.destroy({medicare_no: req.body.patients.map(v => v.medicare_no)}).exec((error) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.json(204);
                 return next();
             });

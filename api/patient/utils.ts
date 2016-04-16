@@ -49,12 +49,7 @@ export function createPatient(newPatient: IPatientBase,
     ], callback);
     /* // Sample callback
      (error, results: IResult) => {
-     if (error) {
-     const e: errors.CustomError = fmtError(error);
-     res.send(e.statusCode, e.body);
-     return next();
-     }
-
+     next.ifError(fmtError(error));
      res.json(201, results);
      return next();
      })

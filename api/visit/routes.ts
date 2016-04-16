@@ -1,8 +1,7 @@
 import * as restify from 'restify';
-import {NotFoundError} from 'restify';
+import {NotFoundError, fmtError} from './../../utils/errors';
 import {has_body} from './../../utils/validators';
-import {collections, multipartyMiddleware} from './../../main';
-import {fmtError} from './../../utils/helpers';
+import {collections} from './../../main';
 import {IVisit} from './models.d.ts';
 import {fetchVisit, fetchVisits, IVisitFetchRequest, IVisitsFetchRequest} from './middleware';
 import {has_auth} from '../auth/middleware';
@@ -21,38 +20,15 @@ export function create(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
     app.post(`${namespace}/patient/:medicare_no/${noun}`, has_body, has_auth(),
-        //multipartyMiddleware, //mk_valid_body_mw(user_schema),
         function (req: createReq, res: restify.Response, next: restify.Next) {
-            const Visit: waterline.Query = collections['visit_tbl'],
-                Patient: waterline.Query = collections['patient_tbl'];
+            const Visit: waterline.Query = collections['visit_tbl'];
 
-            /*
-            var file = req.files.file;
-            console.log('file.name =', file.name);
-            console.log('file.type =', file.type);
-            */
-
-            console.info('req.body =', req.body);
             req.body.medicare_no = req.params.medicare_no;
 
-            Patient.count({medicare_no: req.body.medicare_no}, (err, count) => {
-                if (err) {
-                    const e: errors.CustomError = fmtError(err);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                } else if (!count) {
-                    return next(new NotFoundError('patient'));
-                } else {
-                    Visit.create(req.body).exec((error, visit: IVisit) => {
-                        if (error) {
-                            const e: errors.CustomError = fmtError(error);
-                            res.send(e.statusCode, e.body);
-                            return next();
-                        }
-                        res.json(201, visit);
-                        return next();
-                    });
-                }
+            Visit.create(req.body).exec((error, visit: IVisit) => {
+                next.ifError(fmtError(error));
+                res.json(201, visit);
+                return next();
             });
         }
     )
@@ -77,11 +53,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
             const Visit: waterline.Query = collections['visit_tbl'];
 
             Visit.destroy({createdAt: req.params.createdAt}).exec(error => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.send(204);
                 return next();
             });
@@ -123,11 +95,7 @@ export function batchCreate(app: restify.Server, namespace: string = ""): void {
                 (err || !count) ? next(err || new NotFoundError('patient'))
                     : Visit.createEach(req.body.visits).exec(
                     (error, visits: IVisit[]) => {
-                        if (error) {
-                            const e: errors.CustomError = fmtError(error);
-                            res.send(e.statusCode, e.body);
-                            return next();
-                        }
+                        next.ifError(fmtError(error));
                         res.json({'visits': visits});
                         return next();
                     })
@@ -154,12 +122,8 @@ export function batchDelete(app: restify.Server, namespace: string = ""): void {
                 return next();
             }
 
-            Visit.destroy({medicare_no: req.body.visits.map(v => v.medicare_no)}).exec((error) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+            Visit.destroy({medicare_no: req.body.visits.map(v => v.medicare_no)}).exec(error => {
+                next.ifError(fmtError(error));
                 res.json(204);
                 return next();
             });

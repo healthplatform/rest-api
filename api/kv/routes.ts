@@ -3,7 +3,7 @@ import {collections} from '../../main';
 import {has_body} from './../../utils/validators';
 import {IKV} from './models.d.ts';
 import CustomError = errors.CustomError;
-import {fmtError} from '../../utils/helpers';
+import {fmtError} from '../../utils/errors';
 
 
 export function create(app: restify.Server, namespace: string = ""): void {
@@ -12,11 +12,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
             const KV: waterline.Query = collections['kv_tbl'];
 
             KV.create(req.body).exec((error, kv: IKV) => {
-                if (error) {
-                    const e: errors.CustomError = fmtError(error);
-                    res.send(e.statusCode, e.body);
-                    return next();
-                }
+                next.ifError(fmtError(error));
                 res.json(201, kv);
                 return next();
             });
@@ -31,11 +27,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
 
             KV.findOne({key: req.params.key}).exec(
                 (error, kv: IKV) => {
-                    if (error) {
-                        const e: errors.CustomError = fmtError(error);
-                        res.send(e.statusCode, e.body);
-                        return next();
-                    }
+                    next.ifError(fmtError(error));
                     res.json(kv);
                     return next();
                 });
@@ -48,16 +40,11 @@ export function del(app: restify.Server, namespace: string = ""): void {
         function (req: restify.Request, res: restify.Response, next: restify.Next) {
             const KV: waterline.Query = collections['kv_tbl'];
 
-            KV.destroy({key: req.params.key}).exec(
-                (error) => {
-                    if (error) {
-                        const e: errors.CustomError = fmtError(error);
-                        res.send(e.statusCode, e.body);
-                        return next();
-                    }
-                    res.send(204);
-                    return next();
-                });
+            KV.destroy({key: req.params.key}).exec(error => {
+                next.ifError(fmtError(error));
+                res.send(204);
+                return next();
+            });
         }
     );
 }

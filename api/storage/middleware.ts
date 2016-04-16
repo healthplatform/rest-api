@@ -1,7 +1,6 @@
 import * as restify from 'restify';
-import {NotFoundError} from 'restify';
+import {NotFoundError, fmtError} from './../../utils/errors';
 import {collections} from '../../main';
-import {fmtError} from '../../utils/helpers';
 import {IStorage} from './models.d';
 
 export interface IStorageFetchRequest extends restify.Request {
@@ -19,11 +18,8 @@ export function fetchStorage(req: IStorageFetchRequest, res: restify.Response, n
         uploader: req.params.uploader, // TODO: match with access-token user_id
         name: `${req.params.uploader}/${req.params.filename}`
     }).exec((error, storage: IStorage) => {
-        if (error) {
-            const e: errors.CustomError = fmtError(error);
-            res.send(e.statusCode, e.body);
-            return next();
-        } else if (!storage) {
+        next.ifError(fmtError(error));
+        if (!storage) {
             return next(new NotFoundError('storage'));
         }
 

@@ -81,14 +81,6 @@ export function uri_to_config(uri: string) {
     })(uri.slice('postgres'.length + 3).split(':'))
 }
 
-export function fmtError(error: waterline.WLError | Error | any, statusCode = 400) {
-    if (!error) return null;
-    else if (error.invalidAttributes || error.originalError)
-        return new errors.WaterlineError(error, statusCode);
-    else if (error instanceof RestError) return error;
-    else throw TypeError('Unhandled input to fmtError:' + error)
-}
-
 export function isShallowSubset(o0: {} | Array<any>, o1: {} | Array<any>): boolean {
     const
         l0_keys: Array<string> = (o0 instanceof Array ? o0 : Object.keys(o0)).sort(),
