@@ -13,7 +13,7 @@ export function fetchHistoric(req: IPatientHistoryFetchRequest, res: restify.Res
 
     PatientHistory.findOne({medicare_no: req.params.medicare_no}).exec(
         (error, historic: IPatientHistory) => {
-            next.ifError(fmtError(error));
+            if (error) return next(fmtError(error));
             req.historic = historic;
             return next();
         });

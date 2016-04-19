@@ -1,11 +1,12 @@
 import {collections} from '../../main';
 import {IVisit} from './models.d';
 import {NotFoundError, fmtError} from './../../utils/errors';
+import {getUTCDate} from '../../utils/helpers';
 
 export const Visit = {
     identity: 'visit_tbl',
     connection: 'postgres',
-    beforeCreate: function beforeCreate(visit: IVisit, next) {
+    beforeValidate: (visit: IVisit, next) => {
         const Patient: waterline.Query = collections['patient_tbl'];
         Patient.count({medicare_no: visit.medicare_no}, (err, count) => {
             if (err)
@@ -13,7 +14,9 @@ export const Visit = {
             else if (!count)
                 return next(new NotFoundError('patient'));
 
-            visit.id = visit.medicare_no + visit.createdAt;
+            visit.createdAt = getUTCDate();
+            visit.updatedAt = visit.createdAt;
+            visit.id = `${visit.medicare_no}\t${visit.createdAt.toISOString()}`;
 
             return next();
         });

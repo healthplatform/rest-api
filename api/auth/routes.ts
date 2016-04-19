@@ -23,7 +23,7 @@ export function login(app: restify.Server, namespace: string = ""): void {
                 ),
                 cb => cb(null, AccessToken().add(req.body.email, 'login'))
             ], (error: any, access_token: string) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.setHeader('X-Access-Token', access_token);
                 res.json(201, {access_token: access_token});
                 return next();

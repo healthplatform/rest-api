@@ -1,5 +1,3 @@
-import {RestError} from 'restify';
-import * as errors from './errors';
 import {readdirSync, statSync} from 'fs';
 import {normalize, sep, join} from 'path';
 
@@ -150,4 +148,9 @@ export function groupBy(array: Array<any>, f: Function) {
     return Object.keys(groups).map(function (group) {
         return groups[group];
     });
+}
+
+export function getUTCDate(now = new Date()) {
+    return new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+        now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 }

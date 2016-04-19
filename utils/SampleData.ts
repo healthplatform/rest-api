@@ -72,25 +72,8 @@ export class SampleData {
     public token: string;
     private uri: url.Url;
 
-    constructor(uri: string/*only: Array<string>, uri: string,
-     callback: (error: IncomingMessageF|Error,
-     results: [IncomingMessageF]) => void*/) {
+    constructor(uri: string) {
         this.uri = url.parse(uri);
-
-        /*
-         async.map(only, (fname: string, cb) =>
-         this[fname]((err, res) => {
-         console.log('err =', err, '\nres =', res);
-         return cb(err, res);
-         }), (error, results: [IncomingMessageF]) => {
-         console.log('error =', error, '\nresults =', results);
-         error ? console.error(error.statusCode, error.statusMessage) :
-         results.map((result: IncomingMessageF) =>
-         console.info('result =', result) && console.info(result.statusCode, result.statusMessage));
-         return callback(error, results)
-         }
-         );
-         */
     }
 
     private mergeOptions(options, body?) {

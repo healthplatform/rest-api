@@ -51,8 +51,8 @@ describe('User::routes', () => {
 
         it('PUT should edit user', (done) => {
             async.waterfall([
-                    cb => this.sdk.register(user_mocks.successes[1], cb),
-                    (_, cb) => this.sdk.login(user_mocks.successes[1], (err, res) =>
+                    cb => this.sdk.register(user_mocks.successes[2], cb),
+                    (_, cb) => this.sdk.login(user_mocks.successes[2], (err, res) =>
                         err ? cb(err) : cb(null, res.body.access_token)
                     ),
                     (access_token, cb) =>
@@ -75,19 +75,19 @@ describe('User::routes', () => {
 
         it('DELETE should unregister user', done =>
             async.waterfall([
-                    cb => this.sdk.register(user_mocks.successes[2], cb),
-                    (_, cb) => this.sdk.login(user_mocks.successes[2], (err, res) =>
+                    cb => this.sdk.register(user_mocks.successes[3], cb),
+                    (_, cb) => this.sdk.login(user_mocks.successes[3], (err, res) =>
                         err ? cb(err) : cb(null, res.body.access_token)
                     ),
                     (access_token, cb) =>
-                        this.sdk.unregister({access_token: access_token}, (err) =>
+                        this.sdk.unregister({access_token: access_token}, err =>
                             cb(err, access_token)
                         )
                     ,
-                    (access_token, cb) => AccessToken().findOne(access_token, (e) =>
+                    (access_token, cb) => AccessToken().findOne(access_token, e =>
                         cb(!e ? new Error('Access token wasn\'t invalidated/removed') : null)
                     ),
-                    cb => this.sdk.login(user_mocks.successes[2], (e) =>
+                    cb => this.sdk.login(user_mocks.successes[3], e =>
                         cb(!e ? new Error('User can login after unregister') : null)
                     )
                 ],

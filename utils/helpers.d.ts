@@ -14,6 +14,7 @@ declare module helpers {
         groupBy(a: any[], f: Function): typeof a;
         objListToObj(objList: Array<{}>): {};
         populateModelRoutes(dir: string): IModelRoute;
+        getUTCDate(now: Date): Date;
     }
 
     export interface IModelRoute {

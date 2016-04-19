@@ -3,7 +3,11 @@
 
 import {RestError} from 'restify';
 import {inherits} from 'util';
+import {trivial_merge} from './helpers';
 
+const WLError = require('waterline/lib/waterline/error/WLError.js');
+const WLValidationError = require('waterline/lib/waterline/error/WLValidationError');
+const WLUsageError = require('waterline/lib/waterline/error/WLUsageError');
 
 export function fmtError(error: waterline.WLError | Error | any, statusCode = 400) {
     if (!error) return null;
@@ -14,10 +18,12 @@ export function fmtError(error: waterline.WLError | Error | any, statusCode = 40
     }
 
     if (error instanceof RestError) return error;
-    else if (error.invalidAttributes)
+    else if (error.invalidAttributes || error.hasOwnProperty('internalQuery'))
         return new WaterlineError(error, statusCode);
-    else
+    else {
+        Object.keys(error).map(k => console.log(k, '=', error[k]));
         throw TypeError('Unhandled input to fmtError:' + error)
+    }
 }
 
 export const to_end = res => {
@@ -48,18 +54,25 @@ inherits(NotFoundError, RestError);
 export function WaterlineError(wl_error: waterline.WLError, statusCode = 400) {
     this.name = 'WaterlineError';
     RestError.call(this, <errors.CustomError>{
-            message: wl_error.reason,
+            message: wl_error.reason || wl_error.detail,
             statusCode: statusCode,
             constructorOpt: WaterlineError,
             restCode: this.name,
-            body: {
-                error: wl_error.code,
-                error_message: wl_error.reason,
-                error_metadata: {
-                    details: wl_error.details.split('\n'),
-                    invalidAttributes: wl_error.invalidAttributes
-                }
-            }
+            body: trivial_merge({
+                    error: {
+                        /* TODO: populate with http://www.postgresql.org/docs/9.5/static/errcodes-appendix.html
+                         *  Or use https://raw.githubusercontent.com/ericmj/postgrex/v0.11.1/lib/postgrex/errcodes.txt
+                         * */
+                        23505: 'unique_violation'
+                    }[wl_error.code],
+                    error_message: wl_error.reason || wl_error.detail
+                }, ((o: {error_metadata?: {}}) => Object.keys(o.error_metadata).length > 0 ? o : {})({
+                    error_metadata: trivial_merge({},
+                        wl_error.invalidAttributes ? {invalidAttributes: wl_error.invalidAttributes} : {},
+                        wl_error.details ? {details: wl_error.details.split('\n')} : {}
+                    )
+                })
+            )
         }
     );
 }

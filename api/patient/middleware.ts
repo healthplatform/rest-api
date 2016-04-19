@@ -16,7 +16,7 @@ export function fetchPatient(req: IPatientFetchRequest, res: restify.Response, n
             .populate('gp')
             .populate('other_specialists');
     q.exec((error, patient: IPatient) => {
-        next.ifError(fmtError(error));
+        if (error) return next(fmtError(error));
         if (!patient) {
             return next(new NotFoundError(`patient with medicare_no '${req.params.medicare_no}'`));
         }

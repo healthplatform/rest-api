@@ -102,11 +102,12 @@ export class AuthTestSDK implements ITestSDK {
         )
     }
 
-    register_login(user: IUserBase, done: cb) {
-        user = user || user_mocks.successes[0];
-        if (!user) {
-            return done(new TypeError('user undefined in `register_login`'));
+    register_login(user: IUserBase, num_or_done, done?: cb) {
+        if (!done) {
+            done = num_or_done;
+            num_or_done = 0;
         }
+        user = user || user_mocks.successes[num_or_done];
         async.series([
                 cb => this.register(user, cb),
                 cb => this.login(user, cb)
@@ -119,8 +120,12 @@ export class AuthTestSDK implements ITestSDK {
         )
     }
 
-    logout_unregister(user: IUserBase, done: cb) {
-        user = user || user_mocks.successes[0];
+    logout_unregister(user: IUserBase, num_or_done, done?: cb) {
+        if (!done) {
+            done = num_or_done;
+            num_or_done = 0;
+        }
+        user = user || user_mocks.successes[num_or_done];
         if (!user) {
             return done(new TypeError('user undefined in `logout_unregister`'));
         }

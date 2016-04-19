@@ -16,7 +16,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
             const User: waterline.Query = collections['user_tbl'];
 
             User.create(req.body).exec((error, user: IUser) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.setHeader('X-Access-Token', AccessToken().add(req.body.email, 'login'));
                 res.json(201, user);
                 return next();
@@ -32,7 +32,7 @@ export function read(app: restify.Server, namespace: string = ""): void {
 
             User.findOne({email: req['user_id']},
                 (error: waterline.WLError, user: IUser) => {
-                    next.ifError(fmtError(error));
+                    if (error) return next(fmtError(error));
                     if (!user) next(new NotFoundError('User'));
                     else res.json(user);
                     return next();
@@ -67,7 +67,7 @@ export function update(app: restify.Server, namespace: string = ""): void {
                 (user, cb) =>
                     User.update(user, req.body, (e, r: IUser) => cb(e, r[0]))
             ], (error, result) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.json(200, result);
                 return next()
             });
@@ -84,7 +84,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
                 cb => AccessToken().logout({user_id: req['user_id']}, cb),
                 cb => User.destroy({email: req['user_id']}, cb)
             ], (error) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.send(204);
                 return next()
             });

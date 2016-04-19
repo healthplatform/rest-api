@@ -196,6 +196,7 @@ declare module waterline {
         code: string;
         status: number;
         details: string;
+        detail?: string;
     }
 }
 

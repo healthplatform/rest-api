@@ -10,6 +10,7 @@ export const user_mocks: { successes: Array<IUserBase>, failures: Array<{}> } = 
     "successes": [
         {"email": "foo@bar.com", "password": "foo "},
         {"email": "foo@barc.om", "password": "foo "},
-        {"email": "foobar.com", "password": "foo "}
+        {"email": "foobar.com", "password": "foo "},
+        {"email": "foo@car.com", "password": "foo "}
     ]
 };

@@ -11,7 +11,8 @@ export class HistoricTestSDK {
     }
 
     register(historic: IPatientHistory, cb: cb) {
-        if (!historic) return cb(new TypeError('historic argument to register must be defined'));
+        if (!historic || Object.keys(historic).length < 1)
+            return cb(new TypeError('historic argument to register must be defined'));
         supertest(this.app)
             .post(`/api/patient/${historic.medicare_no}/historic`)
             .set({'X-Access-Token': this.token})
@@ -28,7 +29,8 @@ export class HistoricTestSDK {
     }
 
     deregister(historic: IPatientHistory, cb: cb) {
-        if (!historic) return cb(new TypeError('historic argument to register must be defined'));
+        if (!historic || Object.keys(historic).length < 1)
+            return cb(new TypeError('historic argument to register must be defined'));
         supertest(this.app)
             .delete(`/api/patient/${historic.medicare_no}/historic`)
             .set({'X-Access-Token': this.token})

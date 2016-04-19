@@ -1,9 +1,10 @@
 import * as async from 'async';
 import {main, all_models_and_routes} from './../../../main';
-import {HistoricTestSDK} from './historic_test_sdk';
+import {PrognosisTestSDK} from './prognosis_test_sdk';
 import {PatientTestSDK} from './../patient/patient_test_sdk';
-import {PatientMocks} from './../patient/patient_mocks';
-import {HistoricMocks} from './historic_mocks';
+import {PrognosisMocks} from './prognosis_mocks';
+import {PatientMocks} from '../patient/patient_mocks';
+import {IVisit} from '../../../api/visit/models.d';
 import {AuthTestSDK} from '../auth/auth_test_sdk';
 
 const models_and_routes: helpers.IModelRoute = {
@@ -11,18 +12,18 @@ const models_and_routes: helpers.IModelRoute = {
     auth: all_models_and_routes['auth'],
     contact: all_models_and_routes['contact'],
     patient: all_models_and_routes['patient'],
+    kv: all_models_and_routes['kv'],
     visit: all_models_and_routes['visit'],
-    historic: all_models_and_routes['historic'],
     prognosis:  all_models_and_routes['prognosis']
 };
 
-describe('Historic::routes', () => {
+describe('Prognosis::routes', () => {
     before(done => main(models_and_routes,
         (app, connections) => {
             this.connections = connections;
             this.app = app;
             this.patient_mocks = new PatientMocks();
-            this.mocks = HistoricMocks;
+            this.mocks = PrognosisMocks;
             this.authSDK = new AuthTestSDK(this.app);
 
             async.series([
@@ -33,8 +34,8 @@ describe('Historic::routes', () => {
                     return done(err);
                 }
                 this.token = responses[1];
+                this.sdk = new PrognosisTestSDK(this.app, this.token);
                 this.patientSDK = new PatientTestSDK(this.app, this.token);
-                this.sdk = new HistoricTestSDK(this.app, this.token);
                 return done();
             });
         }
@@ -42,29 +43,32 @@ describe('Historic::routes', () => {
 
     // Deregister database adapter connections
     after(done =>
-        this.connections && async.parallel(Object.keys(this.connections).map(
+        async.parallel(Object.keys(this.connections).map(
             connection => this.connections[connection]._adapter.teardown
         ), done)
     );
 
-    describe('/api/patient/{medicare_no}/historic', () => {
+    /*
+    describe('/api/patient/{medicare_no}/visit', () => {
         beforeEach(done =>
-            async.series([
-                cb => this.patientSDK.deregister(this.patient_mocks.patients[0], () => cb()),
-                cb => this.patientSDK.register(this.patient_mocks.patients[0], cb)
-            ], done)
+            this.patientSDK.deregister(this.patient_mocks.patients[0], () =>
+                this.patientSDK.register(this.patient_mocks.patients[0], done)
+            )
         );
 
         afterEach(done =>
-            async.series([
-                cb => this.sdk.deregister(this.mocks[0], cb),
-                cb => this.patientSDK.deregister(this.patient_mocks.patients[0], cb)
-            ], done)
+            this.sdk.deregister(this.mocks[0], err =>
+                err && done(err) || this.patientSDK.deregister(this.patient_mocks.patients[0], done)
+            )
         );
 
-
-        it('POST should create Historic', (done) => {
-            this.sdk.register(this.mocks[0], done);
+        it('POST should create Visit', (done) => {
+            this.sdk.register(this.mocks[0], (err, visit: IVisit) => {
+                if (err) return done(err);
+                this.mocks[0].createdAt = visit.createdAt;
+                return done();
+            })
         });
     });
+    */
 });

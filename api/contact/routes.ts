@@ -12,7 +12,7 @@ export function batchGet(app: restify.Server, namespace: string = ""): void {
             const Contact: waterline.Query = collections['contact_tbl'];
 
             Contact.find().exec((error, contacts: IContact[]) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.json({'contacts': contacts});
                 return next();
             });
@@ -26,7 +26,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
             const Contact: waterline.Query = collections['contact_tbl'];
 
             Contact.create(req.body).exec((error, contact: IContact) => {
-                    next.ifError(fmtError(error));
+                    if (error) return next(fmtError(error));
                     res.json(contact);
                     return next();
                 }

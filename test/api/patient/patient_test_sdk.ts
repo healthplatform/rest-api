@@ -12,7 +12,8 @@ export class PatientTestSDK {
     }
 
     register(patient: IPatient, cb: cb) {
-        if (!patient) return cb(new TypeError('patient argument to register must be defined'));
+        if (!patient || Object.keys(patient).length < 1)
+            return cb(new TypeError('patient argument to register must be defined'));
         supertest(this.app)
             .post('/api/patient')
             .set({'X-Access-Token': this.token})
@@ -28,7 +29,8 @@ export class PatientTestSDK {
     }
 
     deregister(patient: IPatient, cb: cb) {
-        if (!patient) return cb(new TypeError('patient argument to deregister must be defined'));
+        if (!patient || Object.keys(patient).length < 1)
+            return cb(new TypeError('patient argument to deregister must be defined'));
         supertest(this.app)
             .del(`/api/patient/${patient.medicare_no}`)
             .set({'X-Access-Token': this.token})
@@ -42,7 +44,8 @@ export class PatientTestSDK {
     }
 
     registerMany(patients: {patients: IPatient[]}, cb: cb) {
-        if (!patients) return cb(new TypeError('patients argument to registerMany must be defined'));
+        if (!patients || Object.keys(patients).length < 1 || patients.patients.length < 1)
+            return cb(new TypeError('patients argument to registerMany must be defined'));
         supertest(this.app)
             .post('/api/patients')
             .set({'X-Access-Token': this.token})
@@ -62,7 +65,8 @@ export class PatientTestSDK {
     }
 
     deregisterMany(patients: {patients: IPatient[]}, cb: cb) {
-        if (!patients) return cb(new TypeError('patients argument to deregisterMany must be defined'));
+        if (!patients || Object.keys(patients).length < 1 || patients.patients.length < 1)
+            return cb(new TypeError('patients argument to deregisterMany must be defined'));
         supertest(this.app)
             .del(`/api/patients`)
             .set({'X-Access-Token': this.token})

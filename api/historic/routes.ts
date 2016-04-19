@@ -16,13 +16,13 @@ export function create(app: restify.Server, namespace: string = ""): void {
             const PatientHistory: waterline.Query = collections['patient_historic_tbl'],
                 Patient: waterline.Query = collections['patient_tbl'];
 
-            Patient.count({medicare_no: req.body.medicare_no}, (err, count) => {
-                    next.ifError(err);
+            Patient.count({medicare_no: req.body.medicare_no}, (error, count) => {
+                    if (error) return next(fmtError(error));
                     if (!count) {
                         return next(new NotFoundError('patient'));
                     } else {
-                        PatientHistory.create(req.body).exec((error, historic: IPatientHistory) => {
-                            next.ifError(fmtError(error));
+                        PatientHistory.create(req.body).exec((err, historic: IPatientHistory) => {
+                            if (err) return next(fmtError(err));
                             res.json(201, historic);
                             return next();
                         })
@@ -52,7 +52,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
             const PatientHistory: waterline.Query = collections['patient_historic_tbl'];
 
             PatientHistory.destroy({medicare_no: req.params.medicare_no}).exec(error => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.send(204);
                 return next();
             });

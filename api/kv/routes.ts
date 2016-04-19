@@ -12,7 +12,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
             const KV: waterline.Query = collections['kv_tbl'];
 
             KV.create(req.body).exec((error, kv: IKV) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.json(201, kv);
                 return next();
             });
@@ -27,7 +27,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
 
             KV.findOne({key: req.params.key}).exec(
                 (error, kv: IKV) => {
-                    next.ifError(fmtError(error));
+                    if (error) return next(fmtError(error));
                     res.json(kv);
                     return next();
                 });
@@ -41,7 +41,7 @@ export function del(app: restify.Server, namespace: string = ""): void {
             const KV: waterline.Query = collections['kv_tbl'];
 
             KV.destroy({key: req.params.key}).exec(error => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.send(204);
                 return next();
             });

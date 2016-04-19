@@ -18,7 +18,7 @@ export function fetchStorage(req: IStorageFetchRequest, res: restify.Response, n
         uploader: req.params.uploader, // TODO: match with access-token user_id
         name: `${req.params.uploader}/${req.params.filename}`
     }).exec((error, storage: IStorage) => {
-        next.ifError(fmtError(error));
+        if (error) return next(fmtError(error));
         if (!storage) {
             return next(new NotFoundError('storage'));
         }

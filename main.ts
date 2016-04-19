@@ -7,6 +7,8 @@ import {createLogger} from 'bunyan';
 import {trivial_merge, uri_to_config, populateModelRoutes} from './utils/helpers';
 import {SampleData} from './utils/SampleData';
 import * as multiparty from 'connect-multiparty';
+import {WaterlineError} from './utils/errors';
+import WLError = waterline.WLError;
 
 const package_ = require('./package');
 const logger = createLogger({
@@ -71,20 +73,13 @@ export function main(models_and_routes: helpers.IModelRoute,
     const root: string = '/api';
 
     app.use(restify.queryParser());
-    app.use(restify.bodyParser(/*{
-        multipartHandler: function (part) {
-            const buffer = new Buffer([]);
-            part.on('data', function (data) {
-                console.log('Received', data);
-            });
-        },
-        multipartFileHandler: function (part) {
-            const buffer = new Buffer([]);
-            part.on('data', function (data) {
-                console.log('Received', data);
-            });
-        }
-    }*/));
+    app.use(restify.bodyParser());
+
+    app.on('WLError', (req: restify.Request, res: restify.Response,
+                       err: WLError, next: restify.Next) => {
+        return next(new WaterlineError(err));
+    });
+
     app.on('after', restify.auditLogger({
         log: createLogger({
             name: 'audit',

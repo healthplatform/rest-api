@@ -21,7 +21,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
                 mime_type: req.files.file.type,
                 remote_location: `${namespace}/${req.params.uploader}/${req.files.file.name}`
             }).exec((error, storage: IStorage) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 res.json(201, storage);
                 return next();
             });
@@ -33,7 +33,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
     app.get(`${namespace}/:uploader/:filename`, has_auth(), fetchStorage,
         function (req: IStorageFetchRequest, res: restify.Response, next: restify.Next) {
             readFile(req.storage.local_location, null, (error, fileContents) => {
-                next.ifError(fmtError(error));
+                if (error) return next(fmtError(error));
                 if (!fileContents)
                     return next(new NotFoundError('fileContents'));
                 res.contentType = req.storage.mime_type.slice(req.storage.mime_type.lastIndexOf('/') + 1);

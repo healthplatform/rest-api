@@ -17,7 +17,7 @@ export function fetchVisit(req: IVisitFetchRequest, res: restify.Response, next:
 
     Visit.findOne({createdAt: req.params.createdAt}).exec(
         (error, visit: IVisit) => {
-            next.ifError(fmtError(error));
+            if (error) return next(fmtError(error));
             req.visit = visit;
             return next();
         });
@@ -28,7 +28,7 @@ export function fetchVisits(req: IVisitsFetchRequest, res: restify.Response, nex
 
     Visit.find({medicare_no: req.params.medicare_no}).exec(
         (error, visits: IVisit[]) => {
-            next.ifError(fmtError(error));
+            if (error) return next(fmtError(error));
             req.visits = visits;
             return next();
         });

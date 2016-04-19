@@ -5,7 +5,7 @@ import {NotFoundError, fmtError} from './../../utils/errors';
 export const Prognosis = {
     identity: 'prognosis_tbl',
     connection: 'postgres',
-    beforeCreate: function beforeCreate(prognosis: IPrognosis, next) {
+    beforeValidate: (prognosis: IPrognosis, next) => {
         const Patient: waterline.Query = collections['patient_tbl'],
             Visit: waterline.Query = collections['visit_tbl'];
         Patient.count({medicare_no: prognosis.medicare_no}, (err, patientCount: number) => {

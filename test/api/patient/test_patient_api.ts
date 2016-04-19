@@ -8,7 +8,9 @@ const models_and_routes: helpers.IModelRoute = {
     user: all_models_and_routes['user'],
     auth: all_models_and_routes['auth'],
     contact: all_models_and_routes['contact'],
-    patient: all_models_and_routes['patient']
+    patient: all_models_and_routes['patient'],
+    visit: all_models_and_routes['visit'],
+    prognosis: all_models_and_routes['prognosis']
 };
 
 describe('Patient::routes', () => {
@@ -20,8 +22,8 @@ describe('Patient::routes', () => {
             this.authSDK = new AuthTestSDK(this.app);
 
             async.series([
-                cb => this.authSDK.logout_unregister(undefined, () => cb()),
-                cb => this.authSDK.register_login(undefined, cb)
+                cb => this.authSDK.logout_unregister(undefined, 1, () => cb()),
+                cb => this.authSDK.register_login(undefined, 1, cb)
             ], (err, responses: Array<string>) => {
                 if (err) {
                     return done(err);
