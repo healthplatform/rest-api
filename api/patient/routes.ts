@@ -29,7 +29,7 @@ export function create(app: restify.Server, namespace: string = ""): void {
 export function get(app: restify.Server, namespace: string = ""): void {
     app.get(`${namespace}/:medicare_no`, has_auth(), fetchPatient,
         function (req: IPatientFetchRequest, res: restify.Response, next: restify.Next) {
-            res.json(req.patient.toJSON());
+            res.json(req.patient);
             return next();
         }
     );

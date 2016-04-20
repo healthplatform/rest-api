@@ -23,12 +23,6 @@ export const Prognosis = {
                 });
         });
     },
-    toJSON: function toJSON() {
-        let prognosis: IPrognosis = this.toObject();
-        for (const key in prognosis)
-            if (prognosis.hasOwnProperty(key) && !prognosis[key]) delete prognosis[key];
-        return prognosis;
-    },
     attributes: {
         medicare_no: {
             required: true,
@@ -48,6 +42,12 @@ export const Prognosis = {
         intervention: {
             required: true,
             type: 'string'
+        },
+        toJSON: function toJSON() {
+            let prognosis: IPrognosis = this.toObject();
+            for (const key in prognosis)
+                if (prognosis.hasOwnProperty(key) && !prognosis[key]) delete prognosis[key];
+            return prognosis;
         }
     }
 };

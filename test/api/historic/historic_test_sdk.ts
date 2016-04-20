@@ -20,11 +20,17 @@ export class HistoricTestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(Object.keys(res.body).sort()).to.deep.equal([
-                    'asthma', 'createdAt', 'diabetes', 'ethnicity',
-                    'hbA1c', 'hypertension', 'medicare_no', 'updatedAt'
-                ]);
-                return cb(err, res);
+                try {
+                    expect(res.body).to.be.an('object');
+                    expect(res.body).to.have.all.keys(
+                        'asthma', 'createdAt', 'diabetes', 'ethnicity',
+                        'hbA1c', 'hypertension', 'medicare_no', 'updatedAt'
+                    );
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res);
+                }
             })
     }
 
@@ -38,8 +44,14 @@ export class HistoricTestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(res.statusCode).to.equal(204);
-                return cb(err, res);
+
+                try {
+                    expect(res.statusCode).to.equal(204);
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res);
+                }
             })
     }
 }

@@ -21,12 +21,6 @@ export const Visit = {
             return next();
         });
     },
-    toJSON: function toJSON() {
-        let visit: IVisit = this.toObject();
-        for (const key in visit)
-            if (visit.hasOwnProperty(key) && !visit[key]) delete visit[key];
-        return visit;
-    },
     attributes: {
         id: {
             required: true,
@@ -94,7 +88,7 @@ export const Visit = {
         },
         vf_right_eye: {
             type: 'string'
-        }
+        },
 
         /*
          additional_left_eye: {
@@ -106,5 +100,11 @@ export const Visit = {
          via: 'key'
          },
          */
+        toJSON: function toJSON() {
+            let visit: IVisit = this.toObject();
+            for (const key in visit)
+                if (visit.hasOwnProperty(key) && !visit[key]) delete visit[key];
+            return visit;
+        },
     }
 };

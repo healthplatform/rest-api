@@ -25,9 +25,15 @@ export class AuthTestSDK implements ITestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(res.statusCode).to.be.equal(201);
-                expect(Object.keys(res.body).sort()).to.deep.equal(['createdAt', 'email', 'updatedAt']);
-                return cb(err, res);
+                try {
+                    expect(res.body).to.be.an('object');
+                    expect(res.statusCode).to.be.equal(201);
+                    expect(res.body).to.have.all.keys('createdAt', 'email', 'updatedAt');
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res);
+                }
             });
     }
 
@@ -41,8 +47,13 @@ export class AuthTestSDK implements ITestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(Object.keys(res.body)).to.deep.equal(['access_token']);
-                return cb(err, res);
+                try {
+                    expect(res.body).to.have.property('access_token');
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res);
+                }
             })
     }
 
@@ -54,10 +65,15 @@ export class AuthTestSDK implements ITestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                Object.keys(user).map(
-                    attr => expect(user[attr] === res.body[attr])
-                );
-                return cb(err, res);
+                try {
+                    Object.keys(user).map(
+                        attr => expect(user[attr] === res.body[attr])
+                    );
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res);
+                }
             })
     }
 

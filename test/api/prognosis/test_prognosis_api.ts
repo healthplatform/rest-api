@@ -17,6 +17,8 @@ const models_and_routes: helpers.IModelRoute = {
     prognosis:  all_models_and_routes['prognosis']
 };
 
+process.env.NO_SAMPLE_DATA = true;
+
 describe('Prognosis::routes', () => {
     before(done => main(models_and_routes,
         (app, connections) => {

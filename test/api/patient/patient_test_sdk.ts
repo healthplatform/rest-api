@@ -74,8 +74,15 @@ export class PatientTestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(res.statusCode).to.equal(204);
-                return cb(err, res);
+
+                try {
+                    expect(res.statusCode).to.equal(204);
+
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res);
+                }
             })
     }
 }

@@ -11,6 +11,8 @@ const user_models_and_routes: helpers.IModelRoute = {
     auth: all_models_and_routes['auth'],
 };
 
+process.env.NO_SAMPLE_DATA = true;
+
 describe('User::routes', () => {
     before(done => main(user_models_and_routes,
         (app, connections) => {

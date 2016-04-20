@@ -21,10 +21,18 @@ export class PrognosisTestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(Object.keys(res.body).sort()).to.deep.equal([
-                    'createdAt', 'id', 'iop_left_eye', 'medicare_no', 'updatedAt'
-                ]);
-                return cb(err, res.body);
+                try {
+                    expect(res.body).to.be.an('object');
+                    expect(res.body).to.have.all.keys(
+                        'acuity_left_eye_den', 'acuity_left_eye_num', 'acuity_right_eye_den',
+                        'acuity_right_eye_num', 'createdAt', 'id', 'iop_left_eye', 'iop_right_eye',
+                        'medicare_no', 'updatedAt'
+                    );
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res.body);
+                }
             })
     }
 
@@ -38,8 +46,14 @@ export class PrognosisTestSDK {
             .end((err, res) => {
                 if (err) return cb(err);
                 else if (res.statusCode / 100 >= 3) return cb(new Error(JSON.stringify(res.text, null, 4)));
-                expect(res.statusCode).to.equal(204);
-                return cb(err, res.body);
+
+                try {
+                    expect(res.statusCode).to.equal(204);
+                } catch (e) {
+                    err = <Chai.AssertionError>e;
+                } finally {
+                    cb(err, res.body);
+                }
             })
     }
 
