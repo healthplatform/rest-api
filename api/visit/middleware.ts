@@ -1,7 +1,7 @@
 import * as restify from 'restify';
 import {collections} from '../../main';
 import {IVisit} from './models.d';
-import {fmtError} from '../../utils/errors';
+import {fmtError, NotFoundError} from '../../utils/errors';
 
 export interface IVisitFetchRequest extends restify.Request {
     visit: IVisit;
@@ -18,6 +18,7 @@ export function fetchVisit(req: IVisitFetchRequest, res: restify.Response, next:
     Visit.findOne({createdAt: req.params.createdAt}).exec(
         (error, visit: IVisit) => {
             if (error) return next(fmtError(error));
+            else if(!visit) return next(new NotFoundError('visit'));
             req.visit = visit;
             return next();
         });

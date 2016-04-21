@@ -2,8 +2,7 @@ import * as restify from 'restify';
 import {collections} from '../../main';
 import {has_body} from './../../utils/validators';
 import {IKV} from './models.d.ts';
-import CustomError = errors.CustomError;
-import {fmtError} from '../../utils/errors';
+import {fmtError, NotFoundError} from '../../utils/errors';
 
 
 export function create(app: restify.Server, namespace: string = ""): void {
@@ -28,6 +27,7 @@ export function get(app: restify.Server, namespace: string = ""): void {
             KV.findOne({key: req.params.key}).exec(
                 (error, kv: IKV) => {
                     if (error) return next(fmtError(error));
+                    else if(!kv) return next(new NotFoundError('kv'));
                     res.json(kv);
                     return next();
                 });

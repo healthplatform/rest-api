@@ -19,9 +19,8 @@ export function fetchStorage(req: IStorageFetchRequest, res: restify.Response, n
         name: `${req.params.uploader}/${req.params.filename}`
     }).exec((error, storage: IStorage) => {
         if (error) return next(fmtError(error));
-        if (!storage) {
+        else if (!storage)
             return next(new NotFoundError('storage'));
-        }
 
         req.storage = storage;
         return next();

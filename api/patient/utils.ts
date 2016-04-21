@@ -2,7 +2,8 @@ import * as async from 'async';
 import {collections} from '../../main';
 import {IContact, IContactBase} from '../contact/models.d';
 import {IPatient, IPatientBase} from './models.d';
-import {NotFoundError, DefiniteHttpError} from 'restify';
+import {NotFoundError} from './../../utils/errors'
+import {DefiniteHttpError} from 'restify';
 
 type IResult = [IContact, IPatient];
 

@@ -33,8 +33,8 @@ export function read(app: restify.Server, namespace: string = ""): void {
             User.findOne({email: req['user_id']},
                 (error: waterline.WLError, user: IUser) => {
                     if (error) return next(fmtError(error));
-                    if (!user) next(new NotFoundError('User'));
-                    else res.json(user);
+                    else if (!user) next(new NotFoundError('User'));
+                    res.json(user);
                     return next();
                 }
             );
