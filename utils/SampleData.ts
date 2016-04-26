@@ -68,7 +68,7 @@ export class SampleData {
     public patientMocks = new PatientMocks();
     public userMocks = user_mocks.successes;
     public historicMocks: IPatientHistoryBase[] = HistoricMocks;
-    public visitMocks: IVisitBase[] = VisitMocks;
+    public visitMocks = VisitMocks;
     public token: string;
     private uri: url.Url;
 
@@ -152,7 +152,7 @@ export class SampleData {
 
     loadVisitsHttp(cb) {
         return async.map(
-            this.visitMocks,
+            this.visitMocks.create,
             (visit: IVisit, callback) => httpPOST(
                 this.mergeOptions({path: `/api/patient/${visit.medicare_no}/visit`}),
                 'loadVisitsHttp', JSON.stringify(visit), callback

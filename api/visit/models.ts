@@ -8,15 +8,17 @@ export const Visit = {
     connection: 'postgres',
     beforeValidate: (visit: IVisit, next) => {
         const Patient: waterline.Query = collections['patient_tbl'];
-        Patient.count({medicare_no: visit.medicare_no}, (err, count) => {
+        Patient.count({medicare_no: visit.medicare_no}, (err, count: number) => {
             if (err)
                 return next(fmtError(err));
             else if (!count)
                 return next(new NotFoundError('patient'));
 
-            visit.createdAt = getUTCDate();
-            visit.updatedAt = visit.createdAt;
-            visit.id = `${visit.medicare_no}\t${visit.createdAt.toISOString()}`;
+            if (!visit.id) { // i.e.: this is a `.create` call
+                visit.createdAt = getUTCDate();
+                visit.updatedAt = visit.createdAt;
+                visit.id = `${visit.medicare_no}\t${visit.createdAt.toISOString()}`;
+            }
 
             return next();
         });

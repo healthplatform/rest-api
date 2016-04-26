@@ -15,7 +15,8 @@ export interface IVisitsFetchRequest extends restify.Request {
 export function fetchVisit(req: IVisitFetchRequest, res: restify.Response, next: restify.Next) {
     const Visit: waterline.Query = collections['visit_tbl'];
 
-    Visit.findOne({createdAt: req.params.createdAt}).exec(
+
+    Visit.findOne({id: `${req.params.medicare_no}\t${req.params.createdAt}`}).exec(
         (error, visit: IVisit) => {
             if (error) return next(fmtError(error));
             else if(!visit) return next(new NotFoundError('visit'));

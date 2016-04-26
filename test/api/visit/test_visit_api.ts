@@ -6,6 +6,7 @@ import {VisitMocks} from './visit_mocks';
 import {PatientMocks} from '../patient/patient_mocks';
 import {IVisit} from '../../../api/visit/models.d';
 import {AuthTestSDK} from '../auth/auth_test_sdk';
+import {trivial_merge} from '../../../utils/helpers';
 
 const models_and_routes: helpers.IModelRoute = {
     user: all_models_and_routes['user'],
@@ -19,7 +20,6 @@ const models_and_routes: helpers.IModelRoute = {
 process.env.NO_SAMPLE_DATA = true;
 
 describe('Visit::routes', () => {
-    const self = this;
     before(done => main(models_and_routes,
         (app, connections) => {
             this.connections = connections;
@@ -56,18 +56,50 @@ describe('Visit::routes', () => {
         );
 
         afterEach(done =>
-            this.sdk.deregister(this.mocks[0], err =>
+            this.sdk.deregister(this.mocks.create[0], err =>
                 err ? done(err) : this.patientSDK.deregister(this.patient_mocks.patients[0], done)
             )
         );
 
         it('POST should create Visit', done =>
-            this.sdk.register(this.mocks[0], (err, visit: IVisit) => {
+            this.sdk.register(this.mocks.create[0], (err, visit: IVisit) => {
                 console.info('cb of this.sdk.register');
                 if (err) return done(err);
-                this.mocks[0].createdAt = visit.createdAt;
+                this.mocks.create[0].createdAt = visit.createdAt;
                 return done();
             })
+        );
+
+        it('GET should retrieve Visit', done =>
+            async.waterfall([
+                    cb => this.sdk.register(this.mocks.create[0], cb),
+                    (visit: IVisit, cb) => this.sdk.retrieve(
+                        this.mocks.create[0].medicare_no,
+                        this.mocks.create[0].createdAt,
+                        Object.keys(this.mocks.create[0]).concat('id', 'updatedAt'),
+                        cb
+                    )
+                ], done
+            )
+        );
+
+        it('PUT should update Visit', done =>
+            async.waterfall([
+                    cb => this.sdk.register(this.mocks.create[0], cb),
+                    (visit: IVisit, cb) => this.sdk.update(
+                        trivial_merge(this.mocks.update[0], {createdAt: visit.createdAt}), cb
+                    ),
+                    (visit: IVisit, cb) => this.sdk.update(
+                        trivial_merge(this.mocks.update[0], {createdAt: visit.createdAt}), cb
+                    ),
+                    (visit: IVisit, cb) => this.sdk.retrieve(
+                        this.mocks.create[0].medicare_no,
+                        this.mocks.create[0].createdAt,
+                        Object.keys(this.mocks.create[0]).concat('id', 'updatedAt'),
+                        cb
+                    )
+                ], done
+            )
         );
     });
 
@@ -79,17 +111,16 @@ describe('Visit::routes', () => {
         );
 
         afterEach(done =>
-            this.sdk.deregisterManyFaux({visits: this.mocks}, err =>
+            this.sdk.deregisterManyFaux({visits: this.mocks.create}, err =>
                 err ? done(err) : this.patientSDK.deregisterMany(this.patient_mocks, done)
             )
         );
 
         it('POST should create many Visit', done =>
-            self.sdk.registerManyFaux({visits: this.mocks}, (err, visits: IVisit[]) => {
+            this.sdk.registerManyFaux({visits: this.mocks.create}, (err, visits: IVisit[]) => {
                 if (err) return done(err);
                 for (let i = 0; i < visits.length; i++)
-                    this.mocks[i].createdAt = visits[i].createdAt;
-                console.info(this.mocks);
+                    this.mocks.create[i].createdAt = visits[i].createdAt;
 
                 return done();
             })

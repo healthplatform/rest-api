@@ -3,7 +3,7 @@ import {IPrognosisBase} from '../../../api/prognosis/models.d';
 import {VisitMocks} from '../visit/visit_mocks';
 
 const patientMocks = new PatientMocks();
-const visitMocks = VisitMocks;
+const visitMocks = VisitMocks.create;
 
 export const PrognosisMocks: /*IPrognosisBase*/{}[] = [
     {

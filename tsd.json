@@ -1,78 +1,114 @@
 {
-  "version": "v4",
-  "repo": "borisyankov/DefinitelyTyped",
-  "ref": "master",
-  "path": "typings",
-  "bundle": "typings/tsd.d.ts",
-  "installed": {
-    "node/node.d.ts": {
-      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
-    },
-    "lodash/lodash.d.ts": {
-      "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
-    },
-    "esprima/esprima.d.ts": {
-      "commit": "eb59a40d3c2f3257e34ec2ede181046230814a41"
-    },
-    "estree/estree.d.ts": {
-      "commit": "eb59a40d3c2f3257e34ec2ede181046230814a41"
-    },
-    "bunyan/bunyan.d.ts": {
-      "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
-    },
-    "restify/restify.d.ts": {
-      "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
-    },
-    "tv4/tv4.d.ts": {
-      "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
-    },
-    "supertest/supertest.d.ts": {
-      "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
-    },
-    "superagent/superagent.d.ts": {
-      "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
-    },
-    "mocha/mocha.d.ts": {
-      "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
-    },
-    "assertion-error/assertion-error.d.ts": {
-      "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
-    },
-    "chai/chai.d.ts": {
-      "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
-    },
-    "async/async.d.ts": {
-      "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
-    },
-    "node-uuid/node-uuid.d.ts": {
-      "commit": "785c18f0c897c44ea7fa1a47f3bcb48110658520"
-    },
-    "node-uuid/node-uuid-cjs.d.ts": {
-      "commit": "785c18f0c897c44ea7fa1a47f3bcb48110658520"
-    },
-    "node-uuid/node-uuid-base.d.ts": {
-      "commit": "785c18f0c897c44ea7fa1a47f3bcb48110658520"
-    },
-    "node_redis/node_redis.d.ts": {
-      "commit": "9ec8be78f815b89ab78ab539e6d6676a7cf2baed"
-    },
-    "redis/redis.d.ts": {
-      "commit": "9ec8be78f815b89ab78ab539e6d6676a7cf2baed"
-    },
-    "multiparty/multiparty.d.ts": {
-      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
-    },
-    "express/express.d.ts": {
-      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
-    },
-    "express-serve-static-core/express-serve-static-core.d.ts": {
-      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
-    },
-    "serve-static/serve-static.d.ts": {
-      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
-    },
-    "mime/mime.d.ts": {
-      "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+    "version": "v4",
+    "repo": "borisyankov/DefinitelyTyped",
+    "ref": "master",
+    "path": "typings",
+    "bundle": "typings/tsd.d.ts",
+    "installed": {
+        "angular-ui-router/angular-ui-router.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "angularjs/angular-animate.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "angularjs/angular-mocks.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "angularjs/angular-resource.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "angularjs/angular-sanitize.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "angularjs/angular.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "assertion-error/assertion-error.d.ts": {
+            "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
+        },
+        "async/async.d.ts": {
+            "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
+        },
+        "bunyan/bunyan.d.ts": {
+            "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
+        },
+        "chai/chai.d.ts": {
+            "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
+        },
+        "esprima/esprima.d.ts": {
+            "commit": "eb59a40d3c2f3257e34ec2ede181046230814a41"
+        },
+        "estree/estree.d.ts": {
+            "commit": "eb59a40d3c2f3257e34ec2ede181046230814a41"
+        },
+        "express-serve-static-core/express-serve-static-core.d.ts": {
+            "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+        },
+        "express/express.d.ts": {
+            "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+        },
+        "jasmine/jasmine.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "jquery/jquery.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "karma-jasmine/karma-jasmine.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "lodash/lodash.d.ts": {
+            "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
+        },
+        "mime/mime.d.ts": {
+            "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+        },
+        "mocha/mocha.d.ts": {
+            "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
+        },
+        "moment/moment-node.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "moment/moment.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "multiparty/multiparty.d.ts": {
+            "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+        },
+        "node-uuid/node-uuid-base.d.ts": {
+            "commit": "785c18f0c897c44ea7fa1a47f3bcb48110658520"
+        },
+        "node-uuid/node-uuid-cjs.d.ts": {
+            "commit": "785c18f0c897c44ea7fa1a47f3bcb48110658520"
+        },
+        "node-uuid/node-uuid.d.ts": {
+            "commit": "785c18f0c897c44ea7fa1a47f3bcb48110658520"
+        },
+        "node/node.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        },
+        "node_redis/node_redis.d.ts": {
+            "commit": "9ec8be78f815b89ab78ab539e6d6676a7cf2baed"
+        },
+        "redis/redis.d.ts": {
+            "commit": "9ec8be78f815b89ab78ab539e6d6676a7cf2baed"
+        },
+        "restify/restify.d.ts": {
+            "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
+        },
+        "serve-static/serve-static.d.ts": {
+            "commit": "ec9eb4b28c74665a602c22db3457f0a76fa0fa23"
+        },
+        "superagent/superagent.d.ts": {
+            "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
+        },
+        "supertest/supertest.d.ts": {
+            "commit": "421d6610bdb09e1015b71f5991d7a68d079eca21"
+        },
+        "tv4/tv4.d.ts": {
+            "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
+        },
+        "ui-grid/ui-grid.d.ts": {
+            "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+        }
     }
-  }
 }

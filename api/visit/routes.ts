@@ -34,6 +34,28 @@ export function create(app: restify.Server, namespace: string = ""): void {
     )
 }
 
+export function update(app: restify.Server, namespace: string = ""): void {
+    const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
+    namespace = namespace.substr(0, namespace.lastIndexOf('/'));
+    app.put(`${namespace}/patient/:medicare_no/${noun}/:createdAt`, has_body, has_auth(),
+        function (req: createReq, res: restify.Response, next: restify.Next) {
+            const Visit: waterline.Query = collections['visit_tbl'];
+
+            req.body.medicare_no = req.params.medicare_no;
+            req.body.createdAt = req.params.createdAt;
+            req.body.id = `${req.params.medicare_no}\t${req.params.createdAt}`;
+
+            Visit.update({id: `${req.params.medicare_no}\t${req.params.createdAt}`}, req.body).exec(
+                (error, visits: Array<IVisit>) => {
+                    if (error) return next(fmtError(error));
+                    else if (!visits || !visits.length) return next(new NotFoundError('visit'));
+                    res.json(visits[0]);
+                    return next();
+                });
+        }
+    )
+}
+
 export function get(app: restify.Server, namespace: string = ""): void {
     const noun = namespace.substr(namespace.lastIndexOf('/') + 1);
     namespace = namespace.substr(0, namespace.lastIndexOf('/'));
